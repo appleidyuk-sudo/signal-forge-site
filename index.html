@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Forge — Crafting Intelligent Signal Solutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: #0a0e1a;
+    color: #e0e6f0;
+  }
+
+  /* ── HERO SCREEN ── */
+  .hero {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    background: radial-gradient(ellipse at 30% 40%, #0f1b3d 0%, #0a0e1a 60%),
+                radial-gradient(ellipse at 70% 60%, #1a1040 0%, transparent 50%);
+    overflow: hidden;
+  }
+
+  .hero.hidden {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+
+  /* animated background lines */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 98px, rgba(0,200,255,0.03) 100px),
+      repeating-linear-gradient(0deg, transparent, transparent 98px, rgba(120,80,255,0.03) 100px);
+    animation: gridPulse 8s ease-in-out infinite;
+  }
+
+  @keyframes gridPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* floating particles */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,200,255,0.6), transparent);
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .particle:nth-child(1) { width: 4px; height: 4px; top: 20%; left: 15%; animation-delay: 0s; }
+  .particle:nth-child(2) { width: 3px; height: 3px; top: 60%; left: 80%; animation-delay: 1.5s; }
+  .particle:nth-child(3) { width: 5px; height: 5px; top: 40%; left: 50%; animation-delay: 3s; }
+  .particle:nth-child(4) { width: 3px; height: 3px; top: 75%; left: 25%; animation-delay: 4s; }
+  .particle:nth-child(5) { width: 4px; height: 4px; top: 30%; left: 70%; animation-delay: 2s; }
+  .particle:nth-child(6) { width: 6px; height: 6px; top: 85%; left: 60%; animation-delay: 5s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+    50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #00c8ff 0%, #7b50ff 50%, #ff4da6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.4em;
+    text-shadow: none;
+    filter: drop-shadow(0 0 30px rgba(0,200,255,0.3));
+  }
+
+  .tagline {
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: 300;
+    color: rgba(224,230,240,0.7);
+    letter-spacing: 0.08em;
+    margin-bottom: 2em;
+  }
+
+  .cta-hint {
+    font-size: 0.85rem;
+    color: rgba(0,200,255,0.5);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .cta-hint .arrow {
+    display: inline-block;
+    margin-left: 0.5em;
+    animation: bounce 1.5s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+  }
+
+  /* ── FEATURES SCREEN ── */
+  .features {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 30% 40%, #0f1b3d 0%, #0a0e1a 60%),
+                radial-gradient(ellipse at 70% 60%, #1a1040 0%, transparent 50%);
+    cursor: pointer;
+    padding: 2vh 3vw;
+  }
+
+  .features.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+  }
+
+  .features-header {
+    text-align: center;
+    margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+  }
+
+  .features-header .logo-text {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    margin-bottom: 0.2em;
+  }
+
+  .features-header .sub {
+    font-size: clamp(0.75rem, 1.5vw, 1rem);
+    color: rgba(224,230,240,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: clamp(0.8rem, 1.5vw, 1.2rem);
+    width: min(90vw, 1100px);
+    height: min(65vh, 520px);
+  }
+
+  .card {
+    position: relative;
+    border-radius: 16px;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgba(15, 20, 40, 0.6);
+    border: 1px solid rgba(0, 200, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: cardIn 0.5s ease forwards;
+  }
+
+  .features.visible .card:nth-child(1) { animation-delay: 0.1s; }
+  .features.visible .card:nth-child(2) { animation-delay: 0.15s; }
+  .features.visible .card:nth-child(3) { animation-delay: 0.2s; }
+  .features.visible .card:nth-child(4) { animation-delay: 0.25s; }
+  .features.visible .card:nth-child(5) { animation-delay: 0.3s; }
+  .features.visible .card:nth-child(6) { animation-delay: 0.35s; }
+  .features.visible .card:nth-child(7) { animation-delay: 0.4s; }
+  .features.visible .card:nth-child(8) { animation-delay: 0.45s; }
+  .features.visible .card:nth-child(9) { animation-delay: 0.5s; }
+
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.05), transparent);
+    pointer-events: none;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 200, 255, 0.35);
+    box-shadow: 0 8px 32px rgba(0, 200, 255, 0.15);
+  }
+
+  .card-icon {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    margin-bottom: 0.5em;
+    filter: drop-shadow(0 0 8px rgba(0,200,255,0.4));
+  }
+
+  .card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.65rem, 1.2vw, 0.95rem);
+    letter-spacing: 0.05em;
+    color: #00c8ff;
+    margin-bottom: 0.4em;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: clamp(0.6rem, 1vw, 0.82rem);
+    font-weight: 300;
+    color: rgba(224, 230, 240, 0.65);
+    line-height: 1.4;
+  }
+
+  .back-hint {
+    margin-top: clamp(0.8rem, 1.5vh, 1.5rem);
+    font-size: 0.75rem;
+    color: rgba(0,200,255,0.4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* accent colors per card */
+  .card:nth-child(1) { border-color: rgba(0,200,255,0.15); }
+  .card:nth-child(1) .card-title { color: #00c8ff; }
+  .card:nth-child(2) { border-color: rgba(123,80,255,0.15); }
+  .card:nth-child(2) .card-title { color: #9b7bff; }
+  .card:nth-child(3) { border-color: rgba(255,77,166,0.15); }
+  .card:nth-child(3) .card-title { color: #ff4da6; }
+  .card:nth-child(4) { border-color: rgba(0,255,180,0.15); }
+  .card:nth-child(4) .card-title { color: #00ffb4; }
+  .card:nth-child(5) { border-color: rgba(255,200,0,0.15); }
+  .card:nth-child(5) .card-title { color: #ffc800; }
+  .card:nth-child(6) { border-color: rgba(255,100,50,0.15); }
+  .card:nth-child(6) .card-title { color: #ff6432; }
+  .card:nth-child(7) { border-color: rgba(0,200,150,0.15); }
+  .card:nth-child(7) .card-title { color: #00c896; }
+  .card:nth-child(8) { border-color: rgba(180,100,255,0.15); }
+  .card:nth-child(8) .card-title { color: #b464ff; }
+  .card:nth-child(9) { border-color: rgba(0,180,255,0.15); }
+  .card:nth-child(9) .card-title { color: #00b4ff; }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div class="hero" id="hero" onclick="showFeatures()">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="hero-content">
+    <div class="logo-text">SIGNAL FORGE</div>
+    <div class="tagline">Crafting Intelligent Signal Solutions</div>
+    <div class="cta-hint">Click anywhere to explore <span class="arrow">→</span></div>
+  </div>
+</div>
+
+<!-- ── FEATURES ── -->
+<div class="features" id="features" onclick="showHero()">
+  <div class="features-header">
+    <div class="logo-text">SIGNAL FORGE</div>
+    <div class="sub">Intelligent Tools for Smarter Trading</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">TECHNICAL SIGNALS</div>
+      <div class="card-desc">Bollinger Bands, EMA, RSI, MACD & more — real-time buy/sell signals across multiple indicators</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">👁️</div>
+      <div class="card-title">WATCHLIST & ALERTS</div>
+      <div class="card-desc">Track your portfolio with live prices, custom alerts, and extended-hours monitoring</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <div class="card-title">SECTOR HEATMAP & RISK ANALYSIS</div>
+      <div class="card-desc">Visualize market sectors at a glance with integrated risk scoring and sector rotation insights</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">OPTIONS CHAIN & GREEKS</div>
+      <div class="card-desc">Full chain with delta, gamma, theta, vega butterflies — plus expected move and max pain</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">👻</div>
+      <div class="card-title">GHOST TRADES</div>
+      <div class="card-desc">Paper trade any strategy risk-free — test your thesis before committing real capital</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <div class="card-title">OPTION FLOW STRATEGIES</div>
+      <div class="card-desc">Track covered calls, CSPs, long calls & puts with strategy cycling and income tracking</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <div class="card-title">IV / HV ANALYSIS</div>
+      <div class="card-desc">Implied vs. historical volatility charts and trends to time your entries with precision</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">PROBABILITY ENGINE</div>
+      <div class="card-desc">Lognormal and implied probability distributions — see where the market expects price to land</div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon">🖼️</div>
+      <div class="card-title">EDIT, SAVE & SHARE CHARTS</div>
+      <div class="card-desc">Customize your views, save configurations, and share interactive charts with your network</div>
+    </div>
+
+  </div>
+
+  <div class="back-hint">Click anywhere to return</div>
+</div>
+
+<script>
+  function showFeatures() {
+    document.getElementById('hero').classList.add('hidden');
+    document.getElementById('features').classList.add('visible');
+  }
+
+  function showHero() {
+    document.getElementById('features').classList.remove('visible');
+    document.getElementById('hero').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>
