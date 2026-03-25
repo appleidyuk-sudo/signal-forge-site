@@ -312,6 +312,123 @@
   .card:nth-child(8) .card-title { color: #b464ff; }
   .card:nth-child(9) { border-color: rgba(0,180,255,0.15); }
   .card:nth-child(9) .card-title { color: #00b4ff; }
+
+  /* clickable card hint */
+  .card-clickable { cursor: pointer; }
+  .card-tap-hint {
+    font-size: 0.55rem;
+    color: rgba(255,200,0,0.45);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.4em;
+  }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal-box {
+    position: relative;
+    width: min(92vw, 860px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #0a0e1a;
+    border: 1px solid #1e2340;
+    border-radius: 16px;
+    padding: 40px 24px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+  .modal-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,0.15); }
+  /* modal inner content styles */
+  .modal-box h1 { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .modal-box .subtitle { font-size: 13px; color: #6b7394; margin-bottom: 32px; }
+  .modal-box .step-label {
+    display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: #4a90d9; background: rgba(74,144,217,0.12);
+    padding: 4px 10px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .modal-box h2 { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px; }
+  .modal-box .step-desc { font-size: 13px; color: #9aa0b8; margin-bottom: 16px; }
+  .modal-box .m-card {
+    background: #12162a; border: 1px solid #1e2340; border-radius: 12px;
+    padding: 20px; margin-bottom: 28px;
+  }
+  .modal-box .ind-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .modal-box .ind-table th {
+    text-align: left; font-size: 9px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: #5a6080; padding: 7px 8px; border-bottom: 1px solid #1e2340;
+  }
+  .modal-box .ind-table td { padding: 7px 8px; border-bottom: 1px solid #141830; vertical-align: top; }
+  .modal-box .ind-table tr:last-child td { border-bottom: none; }
+  .modal-box .ind-name { font-weight: 600; color: #c8cde0; }
+  .modal-box .buy-cond { color: #34d399; }
+  .modal-box .sell-cond { color: #f87171; }
+  .modal-box .neutral-cond { color: #6b7394; }
+  .modal-box .formula-box {
+    background: #0d1020; border: 1px solid #1a1f38; border-radius: 8px;
+    padding: 14px 16px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12px; color: #a5b4d4; margin: 14px 0; overflow-x: auto;
+  }
+  .modal-box .formula-box .keyword { color: #c084fc; }
+  .modal-box .formula-box .num { color: #fbbf24; }
+  .modal-box .formula-box .comment { color: #4a5570; }
+  .modal-box .components { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .modal-box .comp-row { display: flex; align-items: center; gap: 10px; }
+  .modal-box .comp-label { font-size: 12px; font-weight: 600; color: #c8cde0; width: 160px; flex-shrink: 0; }
+  .modal-box .comp-bar-bg { flex: 1; height: 20px; background: #1a1f38; border-radius: 6px; overflow: hidden; }
+  .modal-box .comp-bar-fill { height: 100%; border-radius: 6px; }
+  .modal-box .comp-pct { font-size: 11px; font-weight: 700; color: #9aa0b8; width: 34px; text-align: right; flex-shrink: 0; }
+  .modal-box .threshold-bar {
+    position: relative; height: 40px; border-radius: 8px; margin: 18px 0 6px; overflow: hidden;
+    background: linear-gradient(to right, #991b1b 0%, #991b1b 35%, #78640a 35%, #78640a 65%, #166534 65%, #166534 100%);
+  }
+  .modal-box .threshold-labels { display: flex; justify-content: space-between; height: 100%; align-items: center; padding: 0 14px; }
+  .modal-box .threshold-labels span { font-size: 12px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+  .modal-box .threshold-marks { display: flex; justify-content: space-between; font-size: 10px; color: #6b7394; padding: 0 2px; }
+  .modal-box .threshold-marks .mark-35 { margin-left: 33%; }
+  .modal-box .threshold-marks .mark-65 { margin-left: 26%; }
+  .modal-box .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 20px 0; flex-wrap: wrap; }
+  .modal-box .flow-box {
+    background: #1a1f38; border: 1px solid #252b48; border-radius: 8px;
+    padding: 7px 12px; font-size: 11px; font-weight: 600; color: #c8cde0; text-align: center;
+  }
+  .modal-box .flow-arrow { color: #4a5570; font-size: 16px; }
+  .modal-box .note {
+    background: rgba(74,144,217,0.08); border-left: 3px solid #4a90d9;
+    padding: 11px 14px; border-radius: 0 8px 8px 0; font-size: 12px; color: #9aa0b8; margin-top: 18px;
+  }
+  .modal-box .note strong { color: #c8cde0; }
 </style>
 </head>
 <body>
@@ -368,10 +485,11 @@
       <div class="card-desc">Full chain with delta, gamma, theta, vega butterflies — plus expected move and max pain</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal()">
       <div class="card-icon">👻</div>
       <div class="card-title">GHOST TRADES</div>
       <div class="card-desc">Paper trade any strategy risk-free — test your thesis before committing real capital</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
     <div class="card">
@@ -407,6 +525,121 @@
   <div class="back-hint">Click anywhere to return</div>
 </div>
 
+<!-- ── BUY SIGNAL MODAL ── -->
+<div class="modal-overlay" id="signalModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>What Constitutes a Buy Signal</h1>
+    <p class="subtitle">SignalForge Simulator — Unified Signal System</p>
+
+    <div class="flow">
+      <div class="flow-box">10 Indicators</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">5 Components</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">1 Composite Score</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">Threshold Check</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box" style="background:#166534; border-color:#22c55e;">BUY / HOLD / SELL</div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="m-card">
+      <span class="step-label">Step 1</span>
+      <h2>Signal Convergence <span style="color:#6b7394; font-weight:400; font-size:13px;">(35% of final score)</span></h2>
+      <p class="step-desc">Each of 10 technical indicators votes buy, sell, or neutral. Only indicators with a definitive signal count toward the score.</p>
+      <table class="ind-table">
+        <thead><tr><th>Indicator</th><th>BUY when</th><th>SELL when</th><th>Neutral when</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Bollinger Bands</td><td class="buy-cond">Price ≤ lower band</td><td class="sell-cond">Price ≥ upper band</td><td class="neutral-cond">Between bands</td></tr>
+          <tr><td class="ind-name">RSI (14)</td><td class="buy-cond">&lt; 30</td><td class="sell-cond">&gt; 70</td><td class="neutral-cond">30 – 70</td></tr>
+          <tr><td class="ind-name">EMA 12/26</td><td class="buy-cond">EMA12 &gt; EMA26</td><td class="sell-cond">EMA12 &lt; EMA26</td><td class="neutral-cond">—</td></tr>
+          <tr><td class="ind-name">MACD</td><td class="buy-cond">MACD &gt; signal line</td><td class="sell-cond">MACD &lt; signal line</td><td class="neutral-cond">—</td></tr>
+          <tr><td class="ind-name">Stochastic %K</td><td class="buy-cond">&lt; 20</td><td class="sell-cond">&gt; 80</td><td class="neutral-cond">20 – 80</td></tr>
+          <tr><td class="ind-name">ADX / DMI</td><td class="buy-cond">+DI &gt; -DI &amp; ADX &gt; 25</td><td class="sell-cond">+DI &lt; -DI &amp; ADX &gt; 25</td><td class="neutral-cond">ADX ≤ 25</td></tr>
+          <tr><td class="ind-name">SuperTrend</td><td class="buy-cond">Uptrend</td><td class="sell-cond">Downtrend</td><td class="neutral-cond">—</td></tr>
+          <tr><td class="ind-name">MFI (14)</td><td class="buy-cond">&lt; 20</td><td class="sell-cond">&gt; 80</td><td class="neutral-cond">20 – 80</td></tr>
+          <tr><td class="ind-name">Williams %R</td><td class="buy-cond">&lt; -80</td><td class="sell-cond">&gt; -20</td><td class="neutral-cond">-80 to -20</td></tr>
+          <tr><td class="ind-name">Momentum Rank</td><td class="buy-cond">Top third</td><td class="sell-cond">Bottom third</td><td class="neutral-cond">Middle third</td></tr>
+        </tbody>
+      </table>
+      <div class="formula-box">
+        <span class="comment">// Example: 7 indicators have data, 5 vote buy</span><br>
+        score = (<span class="num">5</span> buy votes / <span class="num">7</span> total with data) × <span class="num">100</span> = <span class="num">71.4</span>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="m-card">
+      <span class="step-label">Step 2</span>
+      <h2>Five-Component Blend</h2>
+      <p class="step-desc">The signal convergence score is blended with four additional components, each scored 0–100.</p>
+      <div class="components">
+        <div class="comp-row"><span class="comp-label">Signal Convergence</span><div class="comp-bar-bg"><div class="comp-bar-fill" style="width:35%; background: linear-gradient(90deg, #4a90d9, #6bb5ff);"></div></div><span class="comp-pct">35%</span></div>
+        <div class="comp-row"><span class="comp-label">Trend Strength</span><div class="comp-bar-bg"><div class="comp-bar-fill" style="width:25%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div></div><span class="comp-pct">25%</span></div>
+        <div class="comp-row"><span class="comp-label">Momentum Confirmation</span><div class="comp-bar-bg"><div class="comp-bar-fill" style="width:20%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div></div><span class="comp-pct">20%</span></div>
+        <div class="comp-row"><span class="comp-label">Risk Adjustment</span><div class="comp-bar-bg"><div class="comp-bar-fill" style="width:10%; background: linear-gradient(90deg, #ef4444, #f87171);"></div></div><span class="comp-pct">10%</span></div>
+        <div class="comp-row"><span class="comp-label">Sentiment &amp; Earnings</span><div class="comp-bar-bg"><div class="comp-bar-fill" style="width:10%; background: linear-gradient(90deg, #10b981, #34d399);"></div></div><span class="comp-pct">10%</span></div>
+      </div>
+      <table class="ind-table" style="margin-top:14px;">
+        <thead><tr><th>Component</th><th>What It Measures</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Trend Strength</td><td style="color:#9aa0b8;">ADX normalized (40%) + alpha from trend discovery (30%) + Aroon Up (30%)</td></tr>
+          <tr><td class="ind-name">Momentum</td><td style="color:#9aa0b8;">ROC (35%) + momentum rank (25%) + MFI (20%) + OBV slope (20%)</td></tr>
+          <tr><td class="ind-name">Risk Adjustment</td><td style="color:#9aa0b8;">Starts at 100, penalized for: ATR spike (-30), extreme %B (-20), Keltner expansion (-15), W%R overbought (-20)</td></tr>
+          <tr><td class="ind-name">Sentiment</td><td style="color:#9aa0b8;">Starts at 70. Earnings within 7 days: -25. Earnings far away or positive news: +15. Negative news: -15.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="m-card">
+      <span class="step-label">Step 3</span>
+      <h2>Composite Score</h2>
+      <div class="formula-box">
+        score = <span class="num">0.35</span> × signal + <span class="num">0.25</span> × trend + <span class="num">0.20</span> × momentum + <span class="num">0.10</span> × risk + <span class="num">0.10</span> × sentiment
+      </div>
+      <p class="step-desc">Result is a single number from 0 to 100.</p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="m-card">
+      <span class="step-label">Step 4</span>
+      <h2>Threshold Check</h2>
+      <p class="step-desc">The composite score is compared against user-adjustable thresholds (configurable in Settings).</p>
+      <div class="threshold-bar">
+        <div class="threshold-labels">
+          <span>≤ 35 → SELL</span>
+          <span>HOLD</span>
+          <span>≥ 65 → BUY</span>
+        </div>
+      </div>
+      <div class="threshold-marks">
+        <span>0</span>
+        <span class="mark-35">35</span>
+        <span class="mark-65">65</span>
+        <span>100</span>
+      </div>
+      <div class="formula-box" style="margin-top:18px;">
+        <span class="comment">// Read from Settings (adjustable via sliders)</span><br>
+        <span class="keyword">let</span> buyThreshold  = <span class="num">65</span>  <span class="comment">// default</span><br>
+        <span class="keyword">let</span> sellThreshold = <span class="num">35</span>  <span class="comment">// default</span><br><br>
+        <span class="keyword">if</span> score >= buyThreshold  → <span style="color:#34d399; font-weight:700;">BUY</span>  <span class="comment">// opens position if none open</span><br>
+        <span class="keyword">if</span> score <= sellThreshold → <span style="color:#f87171; font-weight:700;">SELL</span> <span class="comment">// closes any open buys</span><br>
+        <span class="keyword">else</span>                     → <span style="color:#fbbf24; font-weight:700;">HOLD</span> <span class="comment">// no action</span>
+      </div>
+      <div class="note">
+        <strong>Threshold impact:</strong> Tighter thresholds (55/45) → more trades, more signals, more noise. Wider thresholds (75/25) → fewer trades, higher conviction, more missed moves. The default 65/35 gives a 30-point Hold zone, which is a moderate stance.
+      </div>
+    </div>
+
+    <p style="font-size:11px; color:#3d4260; text-align:center; margin-top:30px;">
+      SignalForge — Unified Signal System
+    </p>
+  </div>
+</div>
+
 <script>
   function showFeatures() {
     document.getElementById('hero').classList.add('hidden');
@@ -417,6 +650,19 @@
     document.getElementById('features').classList.remove('visible');
     document.getElementById('hero').classList.remove('hidden');
   }
+
+  function showModal() {
+    document.getElementById('signalModal').classList.add('open');
+  }
+
+  function hideModal() {
+    document.getElementById('signalModal').classList.remove('open');
+  }
+
+  // ESC key closes modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hideModal();
+  });
 </script>
 
 </body>
