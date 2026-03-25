@@ -461,59 +461,67 @@
 
   <div class="grid">
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('technicalModal')">
       <div class="card-icon">📊</div>
       <div class="card-title">TECHNICAL SIGNALS</div>
       <div class="card-desc">Bollinger Bands, EMA, RSI, MACD & more — real-time buy/sell signals across multiple indicators</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('watchlistModal')">
       <div class="card-icon">👁️</div>
       <div class="card-title">WATCHLIST & ALERTS</div>
       <div class="card-desc">Track your portfolio with live prices, custom alerts, and extended-hours monitoring</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('heatmapModal')">
       <div class="card-icon">🗺️</div>
       <div class="card-title">SECTOR HEATMAP & RISK ANALYSIS</div>
       <div class="card-desc">Visualize market sectors at a glance with integrated risk scoring and sector rotation insights</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('optionsModal')">
       <div class="card-icon">⚡</div>
       <div class="card-title">OPTIONS CHAIN & GREEKS</div>
       <div class="card-desc">Full chain with delta, gamma, theta, vega butterflies — plus expected move and max pain</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card card-clickable" onclick="event.stopPropagation(); showModal()">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('signalModal')">
       <div class="card-icon">👻</div>
       <div class="card-title">GHOST TRADES</div>
       <div class="card-desc">Paper trade any strategy risk-free — test your thesis before committing real capital</div>
       <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('flowModal')">
       <div class="card-icon">🔄</div>
       <div class="card-title">OPTION FLOW STRATEGIES</div>
       <div class="card-desc">Track covered calls, CSPs, long calls & puts with strategy cycling and income tracking</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('ivhvModal')">
       <div class="card-icon">📈</div>
       <div class="card-title">IV / HV ANALYSIS</div>
       <div class="card-desc">Implied vs. historical volatility charts and trends to time your entries with precision</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('probModal')">
       <div class="card-icon">🎯</div>
       <div class="card-title">PROBABILITY ENGINE</div>
       <div class="card-desc">Lognormal and implied probability distributions — see where the market expects price to land</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
-    <div class="card">
+    <div class="card card-clickable" onclick="event.stopPropagation(); showModal('chartsModal')">
       <div class="card-icon">🖼️</div>
       <div class="card-title">EDIT, SAVE & SHARE CHARTS</div>
       <div class="card-desc">Customize your views, save configurations, and share interactive charts with your network</div>
+      <div class="card-tap-hint">tap for details</div>
     </div>
 
   </div>
@@ -523,6 +531,371 @@
     For More Info — WhatsApp Us
   </a>
   <div class="back-hint">Click anywhere to return</div>
+</div>
+
+<!-- ── MODAL 1: TECHNICAL SIGNALS ── -->
+<div class="modal-overlay" id="technicalModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>📊 Technical Signals Engine</h1>
+    <p class="subtitle">10 indicators working together to generate actionable signals</p>
+
+    <div class="m-card">
+      <span class="step-label">Real-Time Analysis</span>
+      <h2>Multi-Indicator Signal System</h2>
+      <p class="step-desc">SignalForge monitors 10 technical indicators simultaneously for every stock in your portfolio and watchlist. Each indicator independently votes BUY, SELL, or NEUTRAL based on proven technical thresholds.</p>
+      <table class="ind-table">
+        <thead><tr><th>Indicator</th><th>What It Does</th><th>Timeframe</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Bollinger Bands</td><td style="color:#9aa0b8;">Mean reversion — flags when price deviates &gt;2σ from the 20-day moving average</td><td style="color:#6b7394;">20-day</td></tr>
+          <tr><td class="ind-name">EMA 12/26</td><td style="color:#9aa0b8;">Trend direction — bullish when fast EMA crosses above slow EMA</td><td style="color:#6b7394;">12/26-day</td></tr>
+          <tr><td class="ind-name">RSI (14)</td><td style="color:#9aa0b8;">Momentum oscillator — oversold below 30, overbought above 70</td><td style="color:#6b7394;">14-day</td></tr>
+          <tr><td class="ind-name">MACD</td><td style="color:#9aa0b8;">Trend momentum — signal line crossovers indicate direction changes</td><td style="color:#6b7394;">12/26/9</td></tr>
+          <tr><td class="ind-name">Stochastic %K/%D</td><td style="color:#9aa0b8;">Price position within recent range — oversold &lt;20, overbought &gt;80</td><td style="color:#6b7394;">14-day</td></tr>
+          <tr><td class="ind-name">ADX / DMI</td><td style="color:#9aa0b8;">Trend strength — ADX &gt;25 confirms strong trend, +DI/-DI shows direction</td><td style="color:#6b7394;">14-day</td></tr>
+          <tr><td class="ind-name">SuperTrend</td><td style="color:#9aa0b8;">ATR-based trend follower — flips between uptrend and downtrend zones</td><td style="color:#6b7394;">10/3 ATR</td></tr>
+          <tr><td class="ind-name">MFI (14)</td><td style="color:#9aa0b8;">Volume-weighted RSI — incorporates money flow to confirm price moves</td><td style="color:#6b7394;">14-day</td></tr>
+          <tr><td class="ind-name">Williams %R</td><td style="color:#9aa0b8;">Overbought/oversold oscillator — inverted scale, &lt;-80 = oversold</td><td style="color:#6b7394;">14-day</td></tr>
+          <tr><td class="ind-name">OBV / Momentum</td><td style="color:#9aa0b8;">Volume confirmation — rising OBV confirms price trend, divergence warns of reversal</td><td style="color:#6b7394;">Cumulative</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Convergence</span>
+      <h2>Signal Convergence Scoring</h2>
+      <p class="step-desc">Individual indicators are noisy. SignalForge counts how many agree and computes a convergence score — the percentage of indicators voting in the same direction. This feeds into the 5-component composite score that drives the unified BUY/HOLD/SELL signal.</p>
+      <div class="formula-box">
+        <span class="comment">// 7 of 10 indicators have definitive data, 5 vote BUY</span><br>
+        convergence = (<span class="num">5</span> / <span class="num">7</span>) × <span class="num">100</span> = <span class="num">71.4</span> <span class="comment">→ strong buy agreement</span>
+      </div>
+      <div class="note">
+        <strong>Data source:</strong> All price data is fetched via Yahoo Finance v8 chart API with 6 months of daily candles. Extended-hours prices use the 1-day/2-minute intraday endpoint with pre/post market data included.
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Refresh Cycle</span>
+      <h2>How Signals Update</h2>
+      <p class="step-desc">Signals refresh automatically via pull-to-refresh or background task. Each cycle fetches fresh OHLCV data, recomputes all indicators, updates the convergence score, and re-derives the unified signal. Push notifications fire when a stock's signal changes from HOLD to BUY or SELL.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 2: WATCHLIST & ALERTS ── -->
+<div class="modal-overlay" id="watchlistModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>👁️ Watchlist &amp; Alerts</h1>
+    <p class="subtitle">Track stocks, monitor signals, and get notified on changes</p>
+
+    <div class="m-card">
+      <span class="step-label">Portfolio View</span>
+      <h2>Dual-Mode Watchlist</h2>
+      <p class="step-desc">Toggle between Watchlist (stocks you're tracking) and Positions (stocks you own). Each stock shows:</p>
+      <table class="ind-table">
+        <thead><tr><th>Element</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Unified Signal Badge</td><td style="color:#9aa0b8;">BUY (green), HOLD (yellow), or SELL (red) derived from the convergence engine</td></tr>
+          <tr><td class="ind-name">Convergence Score</td><td style="color:#9aa0b8;">0–100 composite score showing overall signal strength</td></tr>
+          <tr><td class="ind-name">Live Price</td><td style="color:#9aa0b8;">Current market price with extended-hours support (pre-market &amp; after-hours)</td></tr>
+          <tr><td class="ind-name">Daily Change</td><td style="color:#9aa0b8;">Dollar and percentage change from previous close</td></tr>
+          <tr><td class="ind-name">BB / EMA Detail</td><td style="color:#9aa0b8;">Individual Bollinger Band and EMA signals shown as secondary indicators</td></tr>
+          <tr><td class="ind-name">P&amp;L (Positions)</td><td style="color:#9aa0b8;">Cost basis, current value, unrealized gain/loss for owned stocks</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Alerts</span>
+      <h2>Price &amp; Signal Alerts</h2>
+      <p class="step-desc">Set custom price alerts on any stock. When the target price is hit, you get a push notification. Signal change notifications fire automatically when a stock transitions between BUY, HOLD, and SELL states — no manual setup needed.</p>
+      <div class="formula-box">
+        <span class="comment">// Signal change notification trigger</span><br>
+        <span class="keyword">if</span> previousSignal[symbol] != currentSignal[symbol]<br>
+        &nbsp;&nbsp;→ push notification: <span style="color:#34d399;">"AAPL changed from HOLD to BUY"</span>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Heatmap / Risk</span>
+      <h2>Integrated Views</h2>
+      <p class="step-desc">Switch between Heatmap view (sector treemap with signal color coding) and Risk Analysis (risk scores by position) using the segmented picker. In Positions mode, toggle between Cost and Value views to see your portfolio from different angles.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 3: SECTOR HEATMAP & RISK ── -->
+<div class="modal-overlay" id="heatmapModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>🗺️ Sector Heatmap &amp; Risk Analysis</h1>
+    <p class="subtitle">Visual market overview with integrated risk scoring</p>
+
+    <div class="m-card">
+      <span class="step-label">Heatmap</span>
+      <h2>Sector Treemap Visualization</h2>
+      <p class="step-desc">Every stock in your portfolio and watchlist is plotted on an interactive treemap, grouped by sector (Technology, Healthcare, Energy, etc.). Box size reflects position value; color reflects the unified signal:</p>
+      <table class="ind-table">
+        <thead><tr><th>Color</th><th>Signal</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td class="buy-cond">■ Green</td><td class="buy-cond">BUY</td><td style="color:#9aa0b8;">Convergence score ≥ buy threshold (default 65)</td></tr>
+          <tr><td style="color:#fbbf24;">■ Yellow</td><td style="color:#fbbf24;">HOLD</td><td style="color:#9aa0b8;">Score between sell and buy thresholds</td></tr>
+          <tr><td class="sell-cond">■ Red</td><td class="sell-cond">SELL</td><td style="color:#9aa0b8;">Convergence score ≤ sell threshold (default 35)</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <strong>Sectors auto-detected:</strong> SignalForge automatically fetches the sector for each stock from Yahoo Finance. Stocks are grouped by their GICS sector classification.
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Risk</span>
+      <h2>Risk Analysis View</h2>
+      <p class="step-desc">Switch to Risk mode to see a risk score for each position. The risk score factors in:</p>
+      <table class="ind-table">
+        <thead><tr><th>Factor</th><th>Weight</th><th>What It Measures</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">ATR Spike</td><td style="color:#9aa0b8;">-30 max</td><td style="color:#9aa0b8;">Abnormally high volatility relative to recent history</td></tr>
+          <tr><td class="ind-name">Bollinger %B Extreme</td><td style="color:#9aa0b8;">-20 max</td><td style="color:#9aa0b8;">Price at extreme edges of the Bollinger envelope</td></tr>
+          <tr><td class="ind-name">Keltner Expansion</td><td style="color:#9aa0b8;">-15 max</td><td style="color:#9aa0b8;">Channel width expanding beyond normal — increased uncertainty</td></tr>
+          <tr><td class="ind-name">Williams %R Overbought</td><td style="color:#9aa0b8;">-20 max</td><td style="color:#9aa0b8;">Price near top of recent range — reversal risk</td></tr>
+        </tbody>
+      </table>
+      <div class="formula-box">
+        riskScore = <span class="num">100</span> - atrPenalty - bbPenalty - keltnerPenalty - wrPenalty<br>
+        <span class="comment">// Lower score = higher risk. Score of 100 = minimal risk detected.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 4: OPTIONS CHAIN & GREEKS ── -->
+<div class="modal-overlay" id="optionsModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>⚡ Options Chain &amp; Greeks</h1>
+    <p class="subtitle">Full option chain analysis with live Greeks and analytics</p>
+
+    <div class="m-card">
+      <span class="step-label">Chain</span>
+      <h2>Live Option Chain</h2>
+      <p class="step-desc">Access the full option chain for any stock via the Research screen. Select from all available expirations, view calls and puts side by side, with real-time bid/ask/last prices. The chain is fetched from Yahoo Finance v7 options endpoint with crumb authentication and 5-minute caching.</p>
+      <table class="ind-table">
+        <thead><tr><th>Data Point</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Bid / Ask / Last</td><td style="color:#9aa0b8;">Real-time option prices with spread visualization</td></tr>
+          <tr><td class="ind-name">Volume / Open Interest</td><td style="color:#9aa0b8;">Horizontal bar charts showing activity and positioning at each strike</td></tr>
+          <tr><td class="ind-name">Implied Volatility</td><td style="color:#9aa0b8;">Per-strike IV with skew visualization across the chain</td></tr>
+          <tr><td class="ind-name">ITM / OTM Shading</td><td style="color:#9aa0b8;">In-the-money strikes are highlighted for quick identification</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Greeks</span>
+      <h2>Greeks Butterfly Visualizations</h2>
+      <p class="step-desc">Interactive butterfly charts for each Greek, plotted across all strikes for the selected expiration:</p>
+      <table class="ind-table">
+        <thead><tr><th>Greek</th><th>What It Shows</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Delta (Δ)</td><td style="color:#9aa0b8;">Price sensitivity — how much the option moves per $1 stock move</td><td style="color:#6b7394;">Directional exposure</td></tr>
+          <tr><td class="ind-name">Gamma (Γ)</td><td style="color:#9aa0b8;">Delta acceleration — how fast delta changes near the strike</td><td style="color:#6b7394;">Risk near expiration</td></tr>
+          <tr><td class="ind-name">Theta (Θ)</td><td style="color:#9aa0b8;">Time decay — dollars lost per day just from time passing</td><td style="color:#6b7394;">Cost of holding</td></tr>
+          <tr><td class="ind-name">Vega (ν)</td><td style="color:#9aa0b8;">Volatility sensitivity — option price change per 1% IV move</td><td style="color:#6b7394;">Vol exposure</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Analytics</span>
+      <h2>Expected Move &amp; Max Pain</h2>
+      <p class="step-desc">Two key analytics computed from the option chain:</p>
+      <div class="formula-box">
+        <span class="comment">// Expected Move (±1σ by expiration)</span><br>
+        expectedMove = stockPrice × ATM_IV × √(DTE / <span class="num">365</span>)<br><br>
+        <span class="comment">// Max Pain — strike where total option holder losses are maximized</span><br>
+        maxPain = <span class="keyword">argmin</span>(Σ call_losses + Σ put_losses <span class="keyword">at each</span> strike)
+      </div>
+      <div class="note">
+        <strong>Cross-view interactivity:</strong> Tap any strike in the chain to highlight it across all Greek charts, OI bars, and the probability distribution. Tap the expected move range to see which strikes fall inside the 1σ envelope.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 6: OPTION FLOW STRATEGIES ── -->
+<div class="modal-overlay" id="flowModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>🔄 Option Flow &amp; Strategy Tracking</h1>
+    <p class="subtitle">Track option strategies with income monitoring and strategy cycling</p>
+
+    <div class="m-card">
+      <span class="step-label">Strategy Types</span>
+      <h2>Supported Option Strategies</h2>
+      <p class="step-desc">Log and track any of these strategies with full P&amp;L, premium tracking, and expiration management:</p>
+      <table class="ind-table">
+        <thead><tr><th>Strategy</th><th>How It Works</th><th>Best When</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Covered Call</td><td style="color:#9aa0b8;">Sell call against owned shares — collect premium, cap upside</td><td style="color:#6b7394;">Neutral/mildly bullish</td></tr>
+          <tr><td class="ind-name">Cash-Secured Put (CSP)</td><td style="color:#9aa0b8;">Sell put backed by cash — collect premium, may be assigned stock</td><td style="color:#6b7394;">Bullish, want to buy lower</td></tr>
+          <tr><td class="ind-name">Long Call</td><td style="color:#9aa0b8;">Buy call for leveraged upside exposure with defined risk</td><td style="color:#6b7394;">Bullish conviction</td></tr>
+          <tr><td class="ind-name">Long Put</td><td style="color:#9aa0b8;">Buy put for downside protection or bearish speculation</td><td style="color:#6b7394;">Bearish / hedging</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Cycling</span>
+      <h2>Strategy Cycling Engine</h2>
+      <p class="step-desc">The cycling engine tracks your strategy lifecycle automatically. When a covered call expires or is closed, it prompts you to roll to the next expiration — keeping the income machine running. Each cycle is logged with dates, premiums, and outcomes.</p>
+      <div class="formula-box">
+        <span class="comment">// Strategy cycle example</span><br>
+        Cycle 1: Sell AAPL $200C Mar → expired worthless → <span style="color:#34d399;">+$320 premium</span><br>
+        Cycle 2: Sell AAPL $205C Apr → closed early    → <span style="color:#34d399;">+$180 premium</span><br>
+        Cycle 3: Sell AAPL $210C May → still active     → <span style="color:#fbbf24;">pending</span><br>
+        <span class="comment">// Total income from AAPL covered calls: $500 realized</span>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Income</span>
+      <h2>Income Dashboard</h2>
+      <p class="step-desc">Track total premium income across all strategies. The dashboard shows active trades separated from closed trades (matching the Simulator layout), with running totals for realized income, unrealized P&amp;L, and strategy-level breakdowns. Sort by underlying, strategy type, or expiration date.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 7: IV / HV ANALYSIS ── -->
+<div class="modal-overlay" id="ivhvModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>📈 IV / HV Analysis</h1>
+    <p class="subtitle">Implied vs. historical volatility — time your entries with precision</p>
+
+    <div class="m-card">
+      <span class="step-label">Volatility Charts</span>
+      <h2>IV vs. HV Comparison</h2>
+      <p class="step-desc">Dual-line chart showing implied volatility (from option prices) versus historical/realized volatility (from actual stock price movement) over time. When IV is significantly above HV, options are "expensive" — good for sellers. When IV is below HV, options are "cheap" — good for buyers.</p>
+      <div class="formula-box">
+        <span class="comment">// Historical Volatility (annualized)</span><br>
+        HV = σ(daily log returns) × √<span class="num">252</span><br><br>
+        <span class="comment">// Implied Volatility</span><br>
+        IV = <span class="keyword">derived from</span> Black-Scholes model via ATM option prices<br><br>
+        <span class="comment">// IV Percentile (where current IV sits vs. past year)</span><br>
+        IV_Rank = (currentIV - <span class="num">52wk</span>Low) / (<span class="num">52wk</span>High - <span class="num">52wk</span>Low) × <span class="num">100</span>
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Trends</span>
+      <h2>IV Trend Analysis</h2>
+      <p class="step-desc">Track how implied volatility trends over time to identify vol expansion/contraction cycles. Rising IV before earnings? Expect a vol crush after the announcement. Falling IV in a quiet market? Premium sellers get squeezed. The trend lines help you time when to buy vs. sell options.</p>
+      <table class="ind-table">
+        <thead><tr><th>IV State</th><th>Interpretation</th><th>Strategy Implication</th></tr></thead>
+        <tbody>
+          <tr><td class="buy-cond">IV &lt; HV</td><td style="color:#9aa0b8;">Options are cheap relative to actual moves</td><td style="color:#34d399;">Buy options (long calls/puts)</td></tr>
+          <tr><td class="sell-cond">IV &gt; HV</td><td style="color:#9aa0b8;">Options are expensive, market pricing in more risk</td><td style="color:#f87171;">Sell options (covered calls, CSPs)</td></tr>
+          <tr><td class="neutral-cond">IV ≈ HV</td><td style="color:#9aa0b8;">Options fairly priced — no vol edge</td><td style="color:#6b7394;">Focus on directional signals instead</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 8: PROBABILITY ENGINE ── -->
+<div class="modal-overlay" id="probModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>🎯 Probability Engine</h1>
+    <p class="subtitle">Statistical distributions showing where the market expects price to land</p>
+
+    <div class="m-card">
+      <span class="step-label">Model 1</span>
+      <h2>Lognormal Distribution</h2>
+      <p class="step-desc">The classical model assumes stock returns are normally distributed (prices are lognormally distributed). Given the current price, implied volatility, and time to expiration, it computes the probability density for every possible future price.</p>
+      <div class="formula-box">
+        <span class="comment">// Lognormal probability density function</span><br>
+        μ = ln(S₀) + (r - σ²/<span class="num">2</span>) × T<br>
+        σ_T = σ × √T<br>
+        P(S) = (<span class="num">1</span> / (S × σ_T × √(2π))) × exp(-(ln(S) - μ)² / (<span class="num">2</span> × σ_T²))
+      </div>
+      <div class="note">
+        <strong>Visual output:</strong> A bell-curve-shaped distribution plotted across price levels. The peak shows the most likely price at expiration. The width reflects implied volatility — higher IV means a wider, flatter curve.
+      </div>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Model 2</span>
+      <h2>Breeden-Litzenberger Implied Distribution</h2>
+      <p class="step-desc">Unlike the lognormal model (which assumes symmetry), the Breeden-Litzenberger method extracts the market's actual probability distribution from observed option prices. It captures skew — the market's real fear of crashes or euphoria about rallies.</p>
+      <div class="formula-box">
+        <span class="comment">// Risk-neutral density from option prices</span><br>
+        f(K) = e^(rT) × (∂²C / ∂K²)<br><br>
+        <span class="comment">// In practice: finite differences across strikes</span><br>
+        f(Kᵢ) ≈ e^(rT) × (C(Kᵢ₊₁) - <span class="num">2</span>C(Kᵢ) + C(Kᵢ₋₁)) / (ΔK²)
+      </div>
+      <p class="step-desc" style="margin-top:14px;">This produces an asymmetric distribution that reflects the actual skew priced into the option market — often showing a "fat left tail" (crash fear) that the lognormal model misses.</p>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Usage</span>
+      <h2>How to Read the Distribution</h2>
+      <table class="ind-table">
+        <thead><tr><th>Feature</th><th>What It Tells You</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Peak Location</td><td style="color:#9aa0b8;">Most probable price at expiration — where to center your strike selection</td></tr>
+          <tr><td class="ind-name">Width / Spread</td><td style="color:#9aa0b8;">Uncertainty — wider = more volatile, narrower = more predictable</td></tr>
+          <tr><td class="ind-name">Skew (left tail)</td><td style="color:#9aa0b8;">Market fear — heavier left tail means puts are expensive (crash protection demand)</td></tr>
+          <tr><td class="ind-name">Expected Move Zone</td><td style="color:#9aa0b8;">The 1σ range (68% probability) highlighted on the chart — your high-confidence zone</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL 9: CHARTS ── -->
+<div class="modal-overlay" id="chartsModal" onclick="hideModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="hideModal()">✕ Close</button>
+    <h1>🖼️ Interactive Charts</h1>
+    <p class="subtitle">Customizable price charts with technical overlays</p>
+
+    <div class="m-card">
+      <span class="step-label">Price Chart</span>
+      <h2>Expanded Chart View</h2>
+      <p class="step-desc">Tap any stock to open a full-screen interactive chart. The chart plots 6 months of daily OHLCV data with these overlay options:</p>
+      <table class="ind-table">
+        <thead><tr><th>Overlay</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Bollinger Bands</td><td style="color:#9aa0b8;">Upper/lower bands (2σ) with 20-day SMA midline — shows volatility envelope</td></tr>
+          <tr><td class="ind-name">EMA 12 / EMA 26</td><td style="color:#9aa0b8;">Fast and slow exponential moving averages — crossovers signal trend changes</td></tr>
+          <tr><td class="ind-name">Volume Bars</td><td style="color:#9aa0b8;">Daily volume colored green (up day) or red (down day) along the bottom</td></tr>
+          <tr><td class="ind-name">Signal Markers</td><td style="color:#9aa0b8;">Buy/sell signal dots plotted at the points where signals triggered</td></tr>
+          <tr><td class="ind-name">SuperTrend Line</td><td style="color:#9aa0b8;">ATR-based support/resistance line that flips between up and down trends</td></tr>
+          <tr><td class="ind-name">Keltner Channels</td><td style="color:#9aa0b8;">ATR-based channels — compare with Bollinger for squeeze detection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="m-card">
+      <span class="step-label">Deep Dive</span>
+      <h2>Stock Research &amp; Deep Dive</h2>
+      <p class="step-desc">The Research screen provides comprehensive analysis for any stock:</p>
+      <table class="ind-table">
+        <thead><tr><th>Feature</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="ind-name">Symbol Search</td><td style="color:#9aa0b8;">Search any ticker — auto-fetches price, chart, and full signal analysis</td></tr>
+          <tr><td class="ind-name">Price Comparison</td><td style="color:#9aa0b8;">Overlay multiple stocks on a normalized chart to compare performance</td></tr>
+          <tr><td class="ind-name">Metrics Cards</td><td style="color:#9aa0b8;">Key stats: market cap, P/E, 52-week range, dividend yield, volume</td></tr>
+          <tr><td class="ind-name">Unified Signal Detail</td><td style="color:#9aa0b8;">Full 5-component score breakdown with individual indicator reads</td></tr>
+          <tr><td class="ind-name">Ghost Trade Entry</td><td style="color:#9aa0b8;">One-tap paper trade directly from the research view</td></tr>
+          <tr><td class="ind-name">Price Alerts</td><td style="color:#9aa0b8;">Set target price alerts with push notification delivery</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ── BUY SIGNAL MODAL ── -->
@@ -651,12 +1024,14 @@
     document.getElementById('hero').classList.remove('hidden');
   }
 
-  function showModal() {
-    document.getElementById('signalModal').classList.add('open');
+  function showModal(id) {
+    document.getElementById(id).classList.add('open');
   }
 
   function hideModal() {
-    document.getElementById('signalModal').classList.remove('open');
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m) {
+      m.classList.remove('open');
+    });
   }
 
   // ESC key closes modal
