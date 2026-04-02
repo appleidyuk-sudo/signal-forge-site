@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Forge — Deep Dive Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', sans-serif;
+    background: #0a0e1a;
+    color: #e0e6f0;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 30% 10%, #0f1b3d 0%, #0a0e1a 60%),
+                radial-gradient(ellipse at 70% 90%, #1a1040 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 200, 255, 0.1);
+    padding: 0 24px;
+  }
+
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .top-bar .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, #00c8ff 0%, #7b50ff 50%, #ff4da6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+  }
+
+  .top-bar .back-link {
+    font-size: 0.85rem;
+    color: rgba(0, 200, 255, 0.6);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .top-bar .back-link:hover { color: #00c8ff; }
+
+  /* ── NAVIGATION ── */
+  .nav-bar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: rgba(10, 14, 26, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 200, 255, 0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-bar::-webkit-scrollbar { height: 0; }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 16px;
+    min-width: max-content;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 18px;
+    text-decoration: none;
+    color: rgba(224, 230, 240, 0.45);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .nav-item:hover { color: rgba(224, 230, 240, 0.8); }
+  .nav-item.active { color: #00c8ff; border-bottom-color: #00c8ff; }
+
+  .nav-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  /* Color accents per tab */
+  .nav-item[data-tab="home"].active { color: #00c8ff; border-bottom-color: #00c8ff; }
+  .nav-item[data-tab="watchlist"].active { color: #9b7bff; border-bottom-color: #9b7bff; }
+  .nav-item[data-tab="heatmap"].active { color: #00ffb4; border-bottom-color: #00ffb4; }
+  .nav-item[data-tab="research"].active { color: #ff4da6; border-bottom-color: #ff4da6; }
+  .nav-item[data-tab="simulator"].active { color: #ffc800; border-bottom-color: #ffc800; }
+  .nav-item[data-tab="optionflow"].active { color: #ff6432; border-bottom-color: #ff6432; }
+  .nav-item[data-tab="settings"].active { color: #b464ff; border-bottom-color: #b464ff; }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 140px 24px 80px;
+  }
+
+  /* ── HERO HEADER ── */
+  .guide-hero {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .guide-hero .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, #00c8ff 0%, #7b50ff 50%, #ff4da6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(0,200,255,0.25));
+  }
+
+  .guide-hero .subtitle {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    color: rgba(224,230,240,0.55);
+    letter-spacing: 0.06em;
+    margin-top: 0.6em;
+  }
+
+  .guide-hero .intro {
+    font-size: 0.9rem;
+    color: rgba(224,230,240,0.4);
+    line-height: 1.7;
+    max-width: 640px;
+    margin: 1.5em auto 0;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 130px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 200, 255, 0.1);
+  }
+
+  .section-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    letter-spacing: 0.06em;
+  }
+
+  /* Section accent colors */
+  #home .section-title { color: #00c8ff; }
+  #watchlist .section-title { color: #9b7bff; }
+  #heatmap .section-title { color: #00ffb4; }
+  #research .section-title { color: #ff4da6; }
+  #simulator .section-title { color: #ffc800; }
+  #optionflow .section-title { color: #ff6432; }
+  #settings .section-title { color: #b464ff; }
+
+  .section-intro {
+    font-size: 0.9rem;
+    color: rgba(224,230,240,0.55);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(15, 20, 40, 0.6);
+    border: 1px solid rgba(0, 200, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(0,200,255,0.03), transparent);
+    pointer-events: none;
+  }
+
+  .card-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #4a90d9;
+    background: rgba(74,144,217,0.12);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .card p, .card li {
+    font-size: 0.85rem;
+    color: #9aa0b8;
+    line-height: 1.65;
+  }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+  }
+
+  .card ul li::before {
+    content: '›';
+    position: absolute;
+    left: 4px;
+    color: #4a90d9;
+    font-weight: 700;
+  }
+
+  /* ── TABLES ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-top: 12px;
+  }
+
+  .info-table th {
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #5a6080;
+    padding: 8px;
+    border-bottom: 1px solid #1e2340;
+  }
+
+  .info-table td {
+    padding: 8px;
+    border-bottom: 1px solid #141830;
+    vertical-align: top;
+    color: #9aa0b8;
+  }
+
+  .info-table tr:last-child td { border-bottom: none; }
+
+  .info-table .label { font-weight: 600; color: #c8cde0; white-space: nowrap; }
+  .buy { color: #34d399; }
+  .sell { color: #f87171; }
+  .hold { color: #fbbf24; }
+
+  /* ── SCREENSHOT PLACEHOLDERS ── */
+  .screenshot {
+    border: 2px dashed rgba(0, 200, 255, 0.2);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    background: rgba(0, 200, 255, 0.02);
+  }
+
+  .screenshot .camera {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    opacity: 0.4;
+  }
+
+  .screenshot .caption {
+    font-size: 0.75rem;
+    color: rgba(0, 200, 255, 0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .screenshot img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* ── TIPS / NOTES ── */
+  .tip {
+    background: rgba(74, 144, 217, 0.08);
+    border-left: 3px solid #4a90d9;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.82rem;
+    color: #9aa0b8;
+    margin: 16px 0;
+  }
+
+  .tip strong { color: #c8cde0; }
+
+  .tip.green {
+    background: rgba(52, 211, 153, 0.08);
+    border-left-color: #34d399;
+  }
+
+  .tip.yellow {
+    background: rgba(251, 191, 36, 0.08);
+    border-left-color: #fbbf24;
+  }
+
+  .tip.red {
+    background: rgba(248, 113, 113, 0.08);
+    border-left-color: #f87171;
+  }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .subsection-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #c8cde0;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subsection-title .icon { font-size: 1.1rem; }
+
+  /* ── FORMULA BOX ── */
+  .formula {
+    background: #0d1020;
+    border: 1px solid #1a1f38;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.75rem;
+    color: #a5b4d4;
+    margin: 14px 0;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .formula .kw { color: #c084fc; }
+  .formula .num { color: #fbbf24; }
+  .formula .cmt { color: #4a5570; }
+  .formula .grn { color: #34d399; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .content { padding: 130px 16px 60px; }
+    .card { padding: 18px; }
+    .nav-item { padding: 8px 12px; font-size: 0.58rem; }
+    .nav-icon { font-size: 1.1rem; }
+    .info-table { font-size: 0.72rem; }
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00c8ff, #7b50ff, #ff4da6);
+    z-index: 200;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <a href="index.html" class="logo-text" style="text-decoration:none;">SIGNAL FORGE</a>
+    <a href="index.html" class="back-link">&larr; Back to Home</a>
+  </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a class="nav-item active" data-tab="home" href="#home">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+    <a class="nav-item" data-tab="watchlist" href="#watchlist">
+      <span class="nav-icon">📋</span> Positions
+    </a>
+    <a class="nav-item" data-tab="heatmap" href="#heatmap">
+      <span class="nav-icon">🗺️</span> Heatmap
+    </a>
+    <a class="nav-item" data-tab="research" href="#research">
+      <span class="nav-icon">🔬</span> Research
+    </a>
+    <a class="nav-item" data-tab="simulator" href="#simulator">
+      <span class="nav-icon">👻</span> Simulator
+    </a>
+    <a class="nav-item" data-tab="optionflow" href="#optionflow">
+      <span class="nav-icon">⚡</span> OptionFlow
+    </a>
+    <a class="nav-item" data-tab="settings" href="#settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+  <!-- Hero Header -->
+  <div class="guide-hero">
+    <div class="logo-text">DEEP DIVE GUIDE</div>
+    <div class="subtitle">Everything you need to master SignalForge</div>
+    <p class="intro">This guide walks you through every screen, button, popup, and feature in the app. Use the navigation bar above to jump to any section. Each section includes step-by-step tutorials and tips to help you get the most out of SignalForge.</p>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 1: HOME                        -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="home">
+    <div class="section-header">
+      <span class="section-icon">🏠</span>
+      <span class="section-title">HOME</span>
+    </div>
+    <p class="section-intro">The Home screen is your command center. It shows your portfolio value, active signals, top picks, and market status at a glance. Everything you need to start your trading day is here.</p>
+
+    <div class="screenshot" id="ss-home-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Home screen full view</div>
+    </div>
+
+    <!-- Header Bar -->
+    <div class="card">
+      <span class="card-label">Header Bar</span>
+      <h3>Logo, Version & Action Buttons</h3>
+      <p>At the top of the Home screen you'll see the SignalForge logo, current version number, and three action buttons:</p>
+      <table class="info-table">
+        <thead><tr><th>Button</th><th>Icon</th><th>What It Does</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Leaderboard</td><td>🏆</td><td>Opens the signal accuracy leaderboard — see how your signals rank against others. You can view by Total Return%, Weekly Return%, Win Rate, Sharpe Ratio, or Streak.</td></tr>
+          <tr><td class="label">Help</td><td>❓</td><td>Opens contextual help explaining the Home screen features.</td></tr>
+          <tr><td class="label">Settings</td><td>⚙️</td><td>Opens the full Settings panel (covered in the <a href="#settings" style="color:#4a90d9;">Settings section</a>).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Market Status -->
+    <div class="card">
+      <span class="card-label">Market Status</span>
+      <h3>Market Status Pill</h3>
+      <p>A colored pill badge shows the current market state based on Eastern Time zone rules:</p>
+      <table class="info-table">
+        <thead><tr><th>Status</th><th>Color</th><th>Hours (ET)</th></tr></thead>
+        <tbody>
+          <tr><td class="label buy">OPEN</td><td class="buy">Green</td><td>9:30 AM – 4:00 PM, Mon–Fri</td></tr>
+          <tr><td class="label" style="color:#60a5fa;">Pre-Market</td><td style="color:#60a5fa;">Blue</td><td>4:00 AM – 9:30 AM</td></tr>
+          <tr><td class="label hold">After-Hours</td><td class="hold">Yellow</td><td>4:00 PM – 8:00 PM</td></tr>
+          <tr><td class="label sell">CLOSED</td><td class="sell">Red</td><td>Weekends & holidays</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <strong>Tip:</strong> During pre-market and after-hours, extended price data is shown alongside regular closing prices so you can see overnight moves before the market opens.
+      </div>
+    </div>
+
+    <!-- Channel Bar -->
+    <div class="card">
+      <span class="card-label">Channel Bar</span>
+      <h3>Trading Channels</h3>
+      <p>A horizontally scrollable row of channel filter buttons. Each channel represents a trading style or strategy focus. Tap a channel to filter your portfolio signals through that lens.</p>
+      <p style="margin-top:10px;">Channels include categories like Momentum, Swing, Value, and more. The active channel is highlighted with a blue tint. Tap it again to deselect and return to the default "All" view.</p>
+
+      <div class="screenshot" id="ss-home-channels">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Channel bar with one channel selected</div>
+      </div>
+    </div>
+
+    <!-- Position Value Card -->
+    <div class="card">
+      <span class="card-label">Portfolio Summary</span>
+      <h3>Position Value Card</h3>
+      <p>The large hero card at the top shows your total portfolio position value. Here's what each element means:</p>
+      <ul>
+        <li><strong>Position Value</strong> — Your total portfolio value in large monospaced text</li>
+        <li><strong>P&L (green/red)</strong> — Total unrealized profit or loss with an arrow icon indicating direction, plus the percentage</li>
+        <li><strong>Daily P&L</strong> — Today's change broken out separately</li>
+        <li><strong>Extended Hours P&L</strong> — During pre/after hours, shows additional price movement. <em>Tap this</em> to open the Extended Movers sheet showing which stocks moved the most overnight</li>
+        <li><strong>Cost Basis</strong> — Your total cost basis across all positions</li>
+        <li><strong>Last Update</strong> — How recently the data was refreshed (e.g., "2 min ago")</li>
+      </ul>
+      <div class="tip green">
+        <strong>Power tip:</strong> Tap the Position Value card itself to open the <strong>Performance History</strong> chart. This shows your portfolio performance over 1 Day, 1 Week, 1 Month, 1 Quarter, or 1 Year, with an optional SPY benchmark overlay so you can compare your alpha.
+      </div>
+
+      <div class="screenshot" id="ss-home-position">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Position Value card with P&L</div>
+      </div>
+    </div>
+
+    <!-- Signal Count Cards -->
+    <div class="card">
+      <span class="card-label">Signal Overview</span>
+      <h3>Signal Count Cards</h3>
+      <p>Three cards showing the count of stocks with each signal:</p>
+      <table class="info-table">
+        <thead><tr><th>Card</th><th>Color</th><th>Tap Action</th></tr></thead>
+        <tbody>
+          <tr><td class="label buy">BUY</td><td class="buy">Green</td><td>Opens a filtered list showing only stocks with a BUY signal</td></tr>
+          <tr><td class="label hold">HOLD</td><td class="hold">Yellow</td><td>Opens a filtered list showing only HOLD stocks</td></tr>
+          <tr><td class="label sell">SELL</td><td class="sell">Red</td><td>Opens a filtered list showing only SELL stocks</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;">These give you an instant read on the overall health of your portfolio. If you see a lot of SELL signals, it may be time to review your positions.</p>
+    </div>
+
+    <!-- Best/Worst Performers -->
+    <div class="card">
+      <span class="card-label">Performance Highlights</span>
+      <h3>Best & Worst Performers</h3>
+      <p>Two cards highlighting your portfolio extremes:</p>
+      <ul>
+        <li><strong>Best Performer</strong> (green star icon) — The stock with the highest return. Tap to open its Deep Dive.</li>
+        <li><strong>Worst Performer</strong> (red warning icon) — The stock with the worst return. Tap to review whether it's time to exit.</li>
+      </ul>
+    </div>
+
+    <!-- Top Pick -->
+    <div class="card">
+      <span class="card-label">AI Suggestion</span>
+      <h3>Top Pick Signal Card</h3>
+      <p>SignalForge analyzes all your stocks and presents its top pick — the stock with the highest convergence score. The card shows:</p>
+      <ul>
+        <li><strong>Convergence Score</strong> — How many indicators agree (higher = stronger signal)</li>
+        <li><strong>Entry Price</strong> — Current suggested entry point</li>
+        <li><strong>Target Price</strong> — Projected target based on technical analysis</li>
+        <li><strong>Stop Loss</strong> — Suggested stop loss level</li>
+        <li><strong>Projected Profit</strong> — Estimated % gain if target is hit</li>
+      </ul>
+      <p style="margin-top:10px;">Tap the <strong>Criteria</strong> button to see exactly which indicators are driving the signal. Tap the card to open a full Deep Dive. Tap the expand button to see additional ranked suggestions beyond the top pick.</p>
+
+      <div class="screenshot" id="ss-home-toppick">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Top Pick card expanded with criteria</div>
+      </div>
+
+      <div class="tip yellow">
+        <strong>Note:</strong> If your portfolio is empty or all signals are neutral, this card shows "No Suggestion" — add stocks to your watchlist to start generating picks.
+      </div>
+    </div>
+
+    <!-- Performance History Sheet -->
+    <div class="subsection">
+      <div class="subsection-title"><span class="icon">📈</span> Performance History (Sheet)</div>
+      <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:12px;">Opened by tapping the Position Value card. Shows your portfolio growth over time.</p>
+      <ul style="list-style:none; padding:0;">
+        <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> <strong>Timeframe buttons:</strong> 1D, 1W, 1M, 1Q, 1Y</li>
+        <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> <strong>SPY Benchmark toggle:</strong> Overlay S&P 500 performance to measure your alpha</li>
+        <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> <strong>Period stats:</strong> Your return %, SPY return %, and the alpha (difference)</li>
+      </ul>
+
+      <div class="screenshot" id="ss-home-performance">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Performance History with SPY benchmark</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Sheet -->
+    <div class="subsection">
+      <div class="subsection-title"><span class="icon">🏆</span> Leaderboard (Sheet)</div>
+      <p style="font-size:0.85rem; color:#9aa0b8;">Opened by tapping the trophy icon. Compare your signal accuracy with others. Choose a metric (Total Return%, Week Return%, Win Rate, Sharpe Ratio, Streak) to see rankings. Opt in to submit your own results.</p>
+
+      <div class="screenshot" id="ss-home-leaderboard">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Leaderboard rankings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 2: WATCHLIST / POSITIONS        -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="watchlist">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <span class="section-title">POSITIONS / WATCHLIST</span>
+    </div>
+    <p class="section-intro">Your stock management hub. Toggle between Watchlist mode (stocks you're tracking) and Positions mode (stocks you own with cost basis). View in compact or expanded formats, sort by any column, and access deep analytics on every stock.</p>
+
+    <div class="screenshot" id="ss-watchlist-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Watchlist screen in concise view</div>
+    </div>
+
+    <!-- Header & Toggle -->
+    <div class="card">
+      <span class="card-label">Screen Controls</span>
+      <h3>Header & Toggle</h3>
+      <table class="info-table">
+        <thead><tr><th>Element</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Portfolio/Watchlist Toggle</td><td>Switch between tracking mode (watchlist) and ownership mode (positions with P&L). Gold-tinted toggle switch.</td></tr>
+          <tr><td class="label">View Mode Picker</td><td>Segmented control: <strong>Concise</strong> (compact list rows) vs <strong>Expanded</strong> (detailed signal cards). Your choice is saved automatically.</td></tr>
+          <tr><td class="label">Stock Count Badge</td><td>Shows total number of stocks in your current view.</td></tr>
+          <tr><td class="label">Last Update</td><td>Timestamp of the most recent data refresh.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card">
+      <span class="card-label">Action Buttons</span>
+      <h3>Header Action Buttons</h3>
+      <table class="info-table">
+        <thead><tr><th>Button</th><th>What It Does</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Options Overview</td><td>Opens a sheet listing ALL options across your entire portfolio in one view — see Greeks, current prices, and P&L for every option position.</td></tr>
+          <tr><td class="label">Bubble Chart</td><td>Interactive 2D scatter plot. X-axis = momentum rank, Y-axis = signal score. Bubble size = position value. Color = signal (green/yellow/red). Pinch to zoom, tap a bubble to open that stock's Deep Dive.</td></tr>
+          <tr><td class="label">Portfolio Insights</td><td>Two tabs: <strong>News</strong> (aggregated news feed with sentiment badges) and <strong>Earnings</strong> (upcoming earnings grouped by week). Tap any headline to open the article.</td></tr>
+          <tr><td class="label">Help</td><td>Contextual help for the watchlist features.</td></tr>
+          <tr><td class="label">Add Stock (+)</td><td>Opens the Add Stock sheet to add a new ticker.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="screenshot" id="ss-watchlist-buttons">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Watchlist header with all action buttons visible</div>
+      </div>
+    </div>
+
+    <!-- Sorting -->
+    <div class="card">
+      <span class="card-label">Column Sorting</span>
+      <h3>Sort Your Stocks</h3>
+      <p>Tap any column header to sort by that metric. Tap again to reverse the direction. Sortable columns:</p>
+      <ul>
+        <li><strong>SYMBOL</strong> — Alphabetical</li>
+        <li><strong>SIGNAL</strong> — By signal type (BUY → HOLD → SELL)</li>
+        <li><strong>P&L</strong> — By profit/loss (positions mode only)</li>
+        <li><strong>MOM</strong> — By momentum score</li>
+      </ul>
+      <p style="margin-top:8px;">A small arrow icon next to the header shows the current sort direction (ascending ↑ or descending ↓).</p>
+    </div>
+
+    <!-- Concise vs Expanded -->
+    <div class="card">
+      <span class="card-label">View Modes</span>
+      <h3>Concise vs Expanded View</h3>
+      <p><strong>Concise View:</strong> Compact list rows showing symbol, signal badge, P&L, and momentum in a single line. Options appear nested under their parent stock with an indent. Great for quickly scanning a large portfolio.</p>
+      <p style="margin-top:8px;"><strong>Expanded View:</strong> Full signal cards with more detail — technical indicator breakdown, convergence score bar, and additional metrics. Better for analysis when you have fewer stocks to review.</p>
+      <p style="margin-top:8px;">In both views, <strong>tap any stock row/card</strong> to open its full Deep Dive.</p>
+
+      <div class="screenshot" id="ss-watchlist-expanded">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Watchlist in expanded view showing signal cards</div>
+      </div>
+    </div>
+
+    <!-- Add Stock Sheet -->
+    <div class="subsection">
+      <div class="subsection-title"><span class="icon">➕</span> Add Stock (Sheet)</div>
+      <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:12px;">Tap the blue + button to add a stock. Enter the symbol, and optionally provide quantity and average cost. If you leave quantity/cost blank, the stock is added as watchlist-only. Toggle Buy/Sell to indicate your position direction.</p>
+
+      <div class="screenshot" id="ss-watchlist-add">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Add Stock sheet with fields filled in</div>
+      </div>
+    </div>
+
+    <!-- Bubble Chart -->
+    <div class="subsection">
+      <div class="subsection-title"><span class="icon">🫧</span> Bubble Chart (Sheet)</div>
+      <p style="font-size:0.85rem; color:#9aa0b8;">A 2D scatter plot that helps you visually identify your strongest and weakest positions. Stocks in the upper-right quadrant have strong momentum AND strong signals — your best bets. Stocks in the lower-left are weak on both fronts. Pinch to zoom, pan to scroll, and tap any bubble to deep dive into that stock.</p>
+
+      <div class="screenshot" id="ss-watchlist-bubble">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Bubble chart with stocks plotted</div>
+      </div>
+    </div>
+
+    <!-- Portfolio Insights -->
+    <div class="subsection">
+      <div class="subsection-title"><span class="icon">📰</span> Portfolio Insights (Sheet)</div>
+      <p style="font-size:0.85rem; color:#9aa0b8;">Two tabs:</p>
+      <ul style="list-style:none; padding:0;">
+        <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> <strong>News tab:</strong> Aggregated news for all your stocks, with sentiment badges (Bullish/Bearish/Neutral), publisher name, and timestamp. Tap to read the full article.</li>
+        <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> <strong>Earnings tab:</strong> Upcoming earnings reports grouped by week. Know when your stocks report so you can prepare for volatility.</li>
+      </ul>
+
+      <div class="screenshot" id="ss-watchlist-insights">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Portfolio Insights — News tab with sentiment badges</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 3: HEATMAP                      -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="heatmap">
+    <div class="section-header">
+      <span class="section-icon">🗺️</span>
+      <span class="section-title">SECTOR HEATMAP</span>
+    </div>
+    <p class="section-intro">Visualize your entire portfolio in a single glance. The heatmap groups stocks by sector and colors them by signal or P&L, so you can instantly spot concentrations, risks, and opportunities.</p>
+
+    <div class="screenshot" id="ss-heatmap-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Sector Heatmap treemap view</div>
+    </div>
+
+    <!-- Treemap -->
+    <div class="card">
+      <span class="card-label">Treemap View</span>
+      <h3>Squarified Treemap</h3>
+      <p>Each rectangle represents a stock, grouped inside its sector. The layout uses a squarified treemap algorithm for optimal readability.</p>
+      <table class="info-table">
+        <thead><tr><th>Visual Element</th><th>What It Represents</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Tile Size</td><td>Position value (larger tiles = bigger positions). Toggle "Size by value" to switch between equal sizing and value-weighted.</td></tr>
+          <tr><td class="label">Tile Color</td><td>Green = positive P&L or BUY signal. Red = negative P&L or SELL signal. Intensity reflects magnitude.</td></tr>
+          <tr><td class="label">Tile Label</td><td>Stock symbol + P&L percentage or signal designation.</td></tr>
+          <tr><td class="label">Sector Label</td><td>Watermarked sector name (Technology, Healthcare, Energy, etc.) behind the grouped tiles.</td></tr>
+        </tbody>
+      </table>
+      <div class="tip green">
+        <strong>Interaction:</strong> Pinch to zoom into sector clusters. Double-tap to auto-zoom to a specific sector. Tap any tile to open that stock's Deep Dive.
+      </div>
+    </div>
+
+    <!-- Header Controls -->
+    <div class="card">
+      <span class="card-label">Controls</span>
+      <h3>Heatmap Controls</h3>
+      <ul>
+        <li><strong>Portfolio/Watchlist toggle</strong> — Choose which stock set to visualize</li>
+        <li><strong>Size by value checkbox</strong> — When on, tile size reflects position value. When off, all tiles are equal size.</li>
+        <li><strong>View mode toggle</strong> — Switch between Treemap and Risk Analysis views</li>
+        <li><strong>Help button</strong> — Opens heatmap help documentation</li>
+      </ul>
+    </div>
+
+    <!-- Risk Analysis -->
+    <div class="card">
+      <span class="card-label">Risk Analysis View</span>
+      <h3>Portfolio Risk Assessment</h3>
+      <p>Toggle to Risk Analysis mode for a deeper look at portfolio health:</p>
+      <ul>
+        <li><strong>Donut Chart</strong> — Portfolio sector allocation with callout leaders and percentage labels. See instantly if you're over-concentrated in one sector.</li>
+        <li><strong>Concentration Warnings</strong> — Orange/red warnings when any single sector exceeds safe allocation thresholds.</li>
+        <li><strong>Correlation Flags</strong> — Highlights pairs of stocks that are highly correlated — if one drops, the other likely will too. Helps you identify hidden concentration risk.</li>
+        <li><strong>Risk Metrics Table</strong> — Concentration %, sector %, and a correlation matrix for all holdings.</li>
+      </ul>
+
+      <div class="screenshot" id="ss-heatmap-risk">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Risk Analysis view with donut chart and warnings</div>
+      </div>
+
+      <div class="tip yellow">
+        <strong>Best practice:</strong> Check the Risk Analysis view weekly. If one sector dominates more than 40% of your portfolio, consider diversifying to reduce correlation risk.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 4: RESEARCH                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="research">
+    <div class="section-header">
+      <span class="section-icon">🔬</span>
+      <span class="section-title">RESEARCH</span>
+    </div>
+    <p class="section-intro">Your one-stop research lab. Compare stocks, screen for setups, backtest strategies, and dive deep into any ticker with fundamentals, technicals, financials, and news — all in one place.</p>
+
+    <div class="screenshot" id="ss-research-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Research screen showing mode picker</div>
+    </div>
+
+    <!-- Mode Picker -->
+    <div class="card">
+      <span class="card-label">Research Modes</span>
+      <h3>Four Research Modes</h3>
+      <p>A horizontal row of mode buttons at the top lets you switch between four research tools. The active mode is highlighted in blue.</p>
+    </div>
+
+    <!-- Compare -->
+    <div class="card">
+      <span class="card-label">Mode 1</span>
+      <h3>Compare</h3>
+      <p>Compare the performance of multiple stocks on a single normalized chart.</p>
+      <ul>
+        <li><strong>Symbol Search</strong> — Type a ticker and add it to the comparison. Autocomplete helps you find the right symbol.</li>
+        <li><strong>Timeframe Picker</strong> — 1 Week, 1 Month, 3 Months, or 6 Months</li>
+        <li><strong>Normalized Chart</strong> — All stocks start at 0% and diverge from there, so you're comparing relative performance regardless of share price.</li>
+        <li><strong>Legend</strong> — Color-coded legend shows which line belongs to which stock. Tap a stock to remove it from the comparison.</li>
+      </ul>
+
+      <div class="screenshot" id="ss-research-compare">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Compare mode with 3-4 stocks overlaid</div>
+      </div>
+    </div>
+
+    <!-- Discover -->
+    <div class="card">
+      <span class="card-label">Mode 2</span>
+      <h3>Discover (Screener)</h3>
+      <p>Scan large stock universes for the best technical setups.</p>
+      <ul>
+        <li><strong>Universe Picker</strong> — S&P 100, Dow 30, Nasdaq 100, Russell 2000, S&P 500, S&P 400, S&P 600</li>
+        <li><strong>Lookback Period</strong> — 30, 60, 90, or 180 day windows</li>
+        <li><strong>MA Type</strong> — Simple Moving Average (SMA) or Exponential Moving Average (EMA)</li>
+        <li><strong>Sort By</strong> — Score, Alpha, Name, or Signal</li>
+        <li><strong>Results Table</strong> — Sorted list showing convergence scores, signals, and technical readings. Tap any row to open its Deep Dive.</li>
+      </ul>
+
+      <div class="screenshot" id="ss-research-discover">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Discover mode scanning S&P 100 with results</div>
+      </div>
+    </div>
+
+    <!-- Explorer -->
+    <div class="card">
+      <span class="card-label">Mode 3</span>
+      <h3>Explorer (Filtered Screener)</h3>
+      <p>Apply specific technical filters to find stocks matching your criteria. Preset filters for quick access, plus custom filters you can combine:</p>
+      <table class="info-table">
+        <thead><tr><th>Preset Filter</th><th>What It Finds</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Oversold Bounces</td><td>Stocks bouncing off oversold RSI levels</td></tr>
+          <tr><td class="label">Volume Breakouts</td><td>Stocks with abnormal volume spikes</td></tr>
+          <tr><td class="label">BB Squeeze</td><td>Bollinger Band width at lows — ready to expand</td></tr>
+          <tr><td class="label">52-Week High/Low</td><td>Stocks near their yearly extremes</td></tr>
+          <tr><td class="label">Overbought Reversals</td><td>Stocks at overbought levels showing reversal signs</td></tr>
+          <tr><td class="label">SMA Breakouts</td><td>Stocks crossing above key moving averages</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;">Expand the Custom Filter section to combine individual toggles: RSI oversold/overbought, Bollinger Band signals, volume spikes, SMA crossovers, and 52-week proximity.</p>
+
+      <div class="screenshot" id="ss-research-explorer">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Explorer with a preset filter applied and results</div>
+      </div>
+    </div>
+
+    <!-- Showdown / Strategy -->
+    <div class="card">
+      <span class="card-label">Mode 4</span>
+      <h3>Showdown & Strategy (Backtesting)</h3>
+      <p>Two sub-tabs for testing trading ideas historically:</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">⚔️</span> Showdown</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Compare two technical indicators head-to-head on a single stock. Pick Indicator A (e.g., Bollinger Bands) and Indicator B (e.g., MACD), choose a look-forward horizon (5/10/20/60 days), enter a symbol, and run the backtest. Results show win rate, average return, and accuracy for each indicator.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🧪</span> Strategy</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Build multi-condition strategies and backtest them against the S&P 100. Choose from preset strategies or create custom condition sets. Results show accuracy % and simulated returns.</p>
+      </div>
+
+      <div class="screenshot" id="ss-research-showdown">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Showdown comparing two indicators with results</div>
+      </div>
+    </div>
+
+    <!-- Deep Dive Sheet -->
+    <div class="card">
+      <span class="card-label">Deep Dive</span>
+      <h3>Stock Deep Dive (Sheet)</h3>
+      <p>The Deep Dive is accessible from almost anywhere — tap any stock on the Home screen, Watchlist, Heatmap, or Research results. It's a full-screen modal with four tabs:</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📊</span> Tab 1: Fundamentals</div>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Company profile — description (expandable), market cap, industry, website</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Analyst consensus — average price target, rating distribution (buy/hold/sell counts)</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Competitors — similar companies with their technical scores for comparison</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📈</span> Tab 2: Technicals</div>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Price header with badges (52-week high/low, near moving average)</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Signal summary card — BB signal, RSI, EMA, Momentum scores all in one view</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Pattern detection — candlestick patterns automatically identified</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Timeframe picker: 5D, 30D, 90D, 1H, 4H, daily intraday</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Large interactive chart with Bollinger Bands, SMA, volume bars, signal markers, SuperTrend, Keltner Channels. Tap to expand to full-screen immersive mode.</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">💰</span> Tab 3: Financials</div>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> EPS trend chart — quarterly earnings per share over time</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Revenue/profit trend chart</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Quarterly earnings table with year-over-year comparisons</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📰</span> Tab 4: News</div>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Chronological news feed with headline, source, timestamp, and sentiment badge</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute; left:4px; color:#4a90d9; font-weight:700;">›</span> Tap any article to open the full story in your browser</li>
+        </ul>
+      </div>
+
+      <div class="screenshot" id="ss-research-deepdive">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Deep Dive — Technicals tab with chart</div>
+      </div>
+
+      <div class="screenshot" id="ss-research-deepdive-fundamentals">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Deep Dive — Fundamentals tab</div>
+      </div>
+
+      <div class="tip">
+        <strong>Toolbar:</strong> The Deep Dive has a "Done" button (dismiss) and either a "Save" button (to add the stock to your watchlist) or an "Edit" pencil (if it's already in your watchlist).
+      </div>
+    </div>
+
+    <!-- Expanded Chart -->
+    <div class="card">
+      <span class="card-label">Charts</span>
+      <h3>Expanded Chart View</h3>
+      <p>Tap the chart in the Technicals tab to enter full-screen immersive mode. The expanded chart fills the screen with 6 months of daily candlestick data and these overlays:</p>
+      <table class="info-table">
+        <thead><tr><th>Overlay</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Bollinger Bands</td><td>Upper/lower bands (2 standard deviations) with 20-day SMA midline</td></tr>
+          <tr><td class="label">EMA 12 / EMA 26</td><td>Fast and slow exponential moving averages — crossovers highlight trend changes</td></tr>
+          <tr><td class="label">Volume Bars</td><td>Daily volume colored green (up day) or red (down day)</td></tr>
+          <tr><td class="label">Signal Markers</td><td>Buy/sell dots at the exact points where signals triggered</td></tr>
+          <tr><td class="label">SuperTrend</td><td>ATR-based trend line that flips between uptrend and downtrend</td></tr>
+          <tr><td class="label">Keltner Channels</td><td>ATR-based channels — when Bollinger Bands contract inside Keltner, it signals a "squeeze" (breakout imminent)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="screenshot" id="ss-research-chart">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Expanded chart with Bollinger Bands and volume</div>
+      </div>
+    </div>
+
+    <!-- Option Chain -->
+    <div class="card">
+      <span class="card-label">Options</span>
+      <h3>Option Chain & Greeks</h3>
+      <p>Access the full option chain for any stock from the Research/Deep Dive flow:</p>
+      <ul>
+        <li><strong>Expiration Picker</strong> — Pill-based row of all available expirations. Tap to switch.</li>
+        <li><strong>Calls & Puts</strong> — Side-by-side view with bid/ask/last, volume, open interest, and implied volatility per strike.</li>
+        <li><strong>ITM Shading</strong> — In-the-money strikes are highlighted for quick identification.</li>
+        <li><strong>Greeks Butterflies</strong> — Interactive charts for Delta, Gamma, Theta, and Vega plotted across all strikes.</li>
+        <li><strong>OI/Volume Bars</strong> — Horizontal bar charts showing activity at each strike.</li>
+        <li><strong>Expected Move</strong> — The ±1 standard deviation price range by expiration.</li>
+        <li><strong>Max Pain</strong> — The strike where total option holder losses are maximized (where market makers want the price to land).</li>
+      </ul>
+      <div class="tip">
+        <strong>Cross-view interactivity:</strong> Tap any strike in the chain to highlight it across all Greek charts, OI bars, and the probability distribution simultaneously.
+      </div>
+
+      <div class="screenshot" id="ss-research-optionchain">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Option chain with Greeks butterflies visible</div>
+      </div>
+    </div>
+
+    <!-- IV/HV & Probability -->
+    <div class="card">
+      <span class="card-label">Advanced Options Analytics</span>
+      <h3>IV/HV Analysis & Probability Engine</h3>
+      <p><strong>IV vs HV Chart:</strong> Dual-line chart comparing implied volatility (from options) against historical/realized volatility (from actual price movement). When IV > HV, options are "expensive" — favor selling strategies. When IV < HV, options are "cheap" — favor buying.</p>
+      <p style="margin-top:10px;"><strong>Probability Distribution:</strong> Two models visualized side by side:</p>
+      <ul>
+        <li><strong>Lognormal</strong> — Classical bell-curve based on current price, IV, and time to expiration. Shows the theoretical probability of each future price.</li>
+        <li><strong>Breeden-Litzenberger</strong> — Extracts the market's actual probability distribution from observed option prices. Captures skew and fat tails that the lognormal model misses.</li>
+      </ul>
+      <p style="margin-top:10px;">The expected move zone (1 standard deviation, 68% probability) is highlighted on both distributions.</p>
+
+      <div class="screenshot" id="ss-research-ivhv">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: IV/HV chart with probability distribution</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 5: SIMULATOR                    -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="simulator">
+    <div class="section-header">
+      <span class="section-icon">👻</span>
+      <span class="section-title">SIMULATOR (GHOST TRADES)</span>
+    </div>
+    <p class="section-intro">Paper trade any strategy risk-free. The Ghost Trade Simulator lets you test your thesis, track performance, and build confidence before committing real capital. Every trade is tracked with full P&L, win rate, and equity curve analytics.</p>
+
+    <div class="screenshot" id="ss-simulator-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Simulator screen full view with active trades</div>
+    </div>
+
+    <!-- Auto-Trade -->
+    <div class="card">
+      <span class="card-label">Auto-Trade</span>
+      <h3>Automatic Signal Trading</h3>
+      <p>Toggle Auto-Trade on to let SignalForge automatically enter ghost trades based on signal changes. When a stock flips to BUY, a ghost position is opened. When it flips to SELL, the position is closed.</p>
+      <ul>
+        <li><strong>Auto Toggle</strong> — Gold-tinted switch to enable/disable</li>
+        <li><strong>Sizing Mode</strong> — Segmented picker: "Shares" (fixed share count) or "Dollars" (fixed dollar amount per trade)</li>
+        <li><strong>Sizing Value</strong> — Enter the number of shares or dollar amount per auto-trade</li>
+      </ul>
+      <div class="tip green">
+        <strong>How to use:</strong> Set Auto-Trade to "Dollars" with $1,000 per trade. SignalForge will automatically open ghost positions when BUY signals fire and close them on SELL signals. Check back to see how the system would have performed.
+      </div>
+    </div>
+
+    <!-- Grand Total -->
+    <div class="card">
+      <span class="card-label">Account Summary</span>
+      <h3>Grand Total Bar</h3>
+      <p>Shows your simulated account at a glance:</p>
+      <ul>
+        <li><strong>Account Balance</strong> — Current simulated equity</li>
+        <li><strong>Total P&L</strong> — Realized + unrealized profit/loss</li>
+        <li><strong>Win Rate</strong> — Percentage of closed trades that were profitable</li>
+        <li><strong>Starting Capital</strong> — The base amount (resets when you reset the ghost account)</li>
+      </ul>
+    </div>
+
+    <!-- Equity Curve -->
+    <div class="card">
+      <span class="card-label">Charts</span>
+      <h3>Equity Curve</h3>
+      <p>A collapsible line chart showing your simulated account balance over time. Tap "EQUITY CURVE" to expand/collapse. Use the period picker (1D, 1W, 1M, 3M, ALL) to zoom into different time windows. A rising curve means your signals are working.</p>
+
+      <div class="screenshot" id="ss-simulator-equity">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Equity curve chart over 3 months</div>
+      </div>
+    </div>
+
+    <!-- Performance Stats -->
+    <div class="card">
+      <span class="card-label">Analytics</span>
+      <h3>Performance Stats Dashboard</h3>
+      <p>Collapsible section showing detailed trading statistics:</p>
+      <table class="info-table">
+        <thead><tr><th>Metric</th><th>What It Tells You</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Win Rate %</td><td>Percentage of closed trades that ended in profit</td></tr>
+          <tr><td class="label">Avg Winner</td><td>Average profit on winning trades</td></tr>
+          <tr><td class="label">Avg Loser</td><td>Average loss on losing trades</td></tr>
+          <tr><td class="label">Profit Factor</td><td>Gross profits / gross losses. Above 1.0 = profitable system. Above 2.0 = strong.</td></tr>
+          <tr><td class="label">Max Drawdown</td><td>Largest peak-to-trough decline — measures worst-case scenario</td></tr>
+          <tr><td class="label">Sharpe Ratio</td><td>Risk-adjusted return. Above 1.0 = good, above 2.0 = excellent.</td></tr>
+          <tr><td class="label">Total / Closed Trades</td><td>Count of all trades and completed trades</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Active Trades -->
+    <div class="card">
+      <span class="card-label">Active Trades</span>
+      <h3>Open Positions</h3>
+      <p>Each active ghost trade shows:</p>
+      <ul>
+        <li><strong>Symbol</strong> + entry price</li>
+        <li><strong>Current P&L</strong> in dollars and percentage, color-coded green/red</li>
+        <li><strong>Days Held</strong> — How long the position has been open</li>
+        <li><strong>Close button (X)</strong> — Manually close the trade at current price</li>
+        <li><strong>Delete button</strong> — Remove the trade entirely (as if it never happened)</li>
+        <li><strong>Promote to OptionFlow</strong> — For option trades, promotes the ghost trade into a real OptionFlow tracked position</li>
+      </ul>
+
+      <div class="screenshot" id="ss-simulator-trades">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Active ghost trades with P&L</div>
+      </div>
+    </div>
+
+    <!-- Closed Trades -->
+    <div class="card">
+      <span class="card-label">History</span>
+      <h3>Closed & Pending Trades</h3>
+      <p><strong>Closed Trades:</strong> Expandable section showing recently completed trades with exit price, close reason, and final P&L. Use this to review what worked and what didn't.</p>
+      <p style="margin-top:8px;"><strong>Pending Orders:</strong> Orders waiting to fill. You can manually mark them as filled or cancel them.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 6: OPTIONFLOW                   -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="optionflow">
+    <div class="section-header">
+      <span class="section-icon">⚡</span>
+      <span class="section-title">OPTIONFLOW</span>
+    </div>
+    <p class="section-intro">Your options income command center. Track every option trade — single-leg or multi-leg — with full premium tracking, strategy cycling, roll management, income calendars, and real-time Greeks. Built for active option sellers and income-focused traders.</p>
+
+    <div class="screenshot" id="ss-optionflow-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: OptionFlow dashboard with active positions</div>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="card">
+      <span class="card-label">Dashboard</span>
+      <h3>KPI Grid</h3>
+      <p>Six key performance indicators displayed in a 3-column grid at the top:</p>
+      <table class="info-table">
+        <thead><tr><th>KPI</th><th>What It Shows</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Net Premium</td><td>Lifetime option income (green if positive, red if negative)</td></tr>
+          <tr><td class="label">Win Rate</td><td>Percentage of closed option trades that were profitable</td></tr>
+          <tr><td class="label">Active Positions</td><td>Number of currently open option trades</td></tr>
+          <tr><td class="label">Avg Days Held</td><td>Average holding period across all trades</td></tr>
+          <tr><td class="label">Annualized Yield</td><td>Your option income annualized as a percentage of capital deployed</td></tr>
+          <tr><td class="label">Strategy Cycles</td><td>Number of completed strategy cycles (e.g., rolling covered calls month after month)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Strategy Types -->
+    <div class="card">
+      <span class="card-label">Strategy Types</span>
+      <h3>Supported Option Strategies</h3>
+      <table class="info-table">
+        <thead><tr><th>Strategy</th><th>How It Works</th><th>Best When</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Covered Call (Cov Call)</td><td>Sell a call against shares you own. Collect premium, but cap your upside.</td><td class="hold">Neutral / mildly bullish</td></tr>
+          <tr><td class="label">Cash-Secured Put (CSP)</td><td>Sell a put backed by cash. Collect premium; if assigned, you buy the stock at a discount.</td><td class="buy">Bullish, want to buy lower</td></tr>
+          <tr><td class="label">Long Call</td><td>Buy a call for leveraged upside with defined risk (you can only lose the premium).</td><td class="buy">Bullish conviction</td></tr>
+          <tr><td class="label">Long Put</td><td>Buy a put for downside protection or bearish speculation.</td><td class="sell">Bearish / hedging</td></tr>
+          <tr><td class="label">Wheel</td><td>Cycle between CSPs and covered calls on the same stock. Sell puts until assigned, then sell calls.</td><td class="hold">Income generation, neutral</td></tr>
+          <tr><td class="label">Iron Condor</td><td>Sell OTM call spread + OTM put spread. Profit if stock stays in range.</td><td class="hold">Low volatility expected</td></tr>
+          <tr><td class="label">Call Spread / Put Spread</td><td>Defined-risk directional bets using two strikes.</td><td>Directional with limited risk</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recording a Trade -->
+    <div class="card">
+      <span class="card-label">Recording Trades</span>
+      <h3>How to Record an Option Trade</h3>
+      <p>Tap the green <strong>+</strong> button to open the Strategy Picker. Then:</p>
+      <ol style="padding-left:20px; font-size:0.85rem; color:#9aa0b8; line-height:1.8;">
+        <li><strong>Choose single-leg</strong> (Call/Put × Buy/Sell) or <strong>multi-leg template</strong> (Wheel, Iron Condor, etc.)</li>
+        <li>For single-leg, the <strong>Record Trade sheet</strong> opens with fields:
+          <ul style="list-style:disc; padding-left:18px; margin-top:4px;">
+            <li>Symbol (uppercase, auto-loads the option chain)</li>
+            <li>Option Type: Call or Put (segmented picker)</li>
+            <li>Side: Buy or Sell (segmented picker)</li>
+            <li>Trade Date (date picker)</li>
+            <li>Expiration (pill row from the option chain, or manual date picker)</li>
+            <li>Strike (horizontal scroll of available strikes with mid-prices)</li>
+            <li>Contracts (± buttons + number input)</li>
+            <li>Premium per share</li>
+            <li>Commission</li>
+          </ul>
+        </li>
+        <li>A <strong>Total Premium preview</strong> updates in real-time as you fill in fields (green for credits, red for debits)</li>
+        <li>Tap <strong>Save Trade</strong> to record</li>
+      </ol>
+
+      <div class="screenshot" id="ss-optionflow-record">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Record Trade sheet with option chain loaded</div>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> When you enter a symbol, SignalForge auto-fetches the option chain so you can pick from real expirations and strikes. If the chain fails to load, you can still enter values manually.
+      </div>
+    </div>
+
+    <!-- Multi-Leg Builder -->
+    <div class="card">
+      <span class="card-label">Multi-Leg</span>
+      <h3>Strategy Builder (Multi-Leg Trades)</h3>
+      <p>For multi-leg strategies like iron condors or spreads, the Strategy Builder opens with template legs pre-configured. For each leg, set:</p>
+      <ul>
+        <li>Underlying symbol, option type, side, strike, premium</li>
+        <li>Real-time P&L estimate as you fill in values</li>
+        <li>Max profit / max loss calculations displayed at the bottom</li>
+      </ul>
+      <p style="margin-top:8px;">All legs are grouped together as a single strategy cycle in the dashboard, so your income tracking is accurate across the entire structure.</p>
+
+      <div class="screenshot" id="ss-optionflow-multileg">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Strategy Builder for an Iron Condor</div>
+      </div>
+    </div>
+
+    <!-- Active Positions Detail -->
+    <div class="card">
+      <span class="card-label">Position Management</span>
+      <h3>Active Position Cards</h3>
+      <p>Each active trade card shows:</p>
+      <table class="info-table">
+        <thead><tr><th>Element</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Strategy Pill</td><td>Colored badge showing the strategy type (CSP, Cov Call, Long Call, etc.)</td></tr>
+          <tr><td class="label">Underlying + Strike</td><td>The stock symbol, strike price, and premium collected/paid</td></tr>
+          <tr><td class="label">DTE</td><td>Days to expiration. Color-coded: red if ≤7 days, yellow if ≤21 days, white otherwise.</td></tr>
+          <tr><td class="label">ROC %</td><td>Return on capital — premium received as a percentage of capital at risk</td></tr>
+          <tr><td class="label">Roll Advisor Badge</td><td>Appears when the position is eligible to roll. Tap for roll suggestions.</td></tr>
+          <tr><td class="label">Earnings Warning</td><td>Badge appears when the underlying reports earnings before expiration.</td></tr>
+          <tr><td class="label">Close Button (X)</td><td>Opens the Close Position sheet.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;"><strong>Tap any card</strong> to open the Position Detail sheet with full trade info, Greeks (delta/gamma/theta/vega), time decay chart, P&L diagram, and roll/close options.</p>
+
+      <div class="screenshot" id="ss-optionflow-position">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Active position card with DTE and roll badge</div>
+      </div>
+    </div>
+
+    <!-- Strategy Cycling -->
+    <div class="card">
+      <span class="card-label">Strategy Cycling</span>
+      <h3>How Cycling Works</h3>
+      <p>The cycling engine tracks your strategy lifecycle automatically. Multi-leg cycles are grouped under a strategy header showing the cycle number and running income total.</p>
+      <div class="formula">
+        <span class="cmt">// Example: Wheel strategy on AAPL</span><br>
+        Cycle 1: Sell AAPL $190P Mar &rarr; expired worthless &rarr; <span class="grn">+$320 premium</span><br>
+        Cycle 2: Sell AAPL $195P Apr &rarr; assigned        &rarr; <span class="grn">+$280 premium</span> (now own shares)<br>
+        Cycle 3: Sell AAPL $200C May &rarr; called away      &rarr; <span class="grn">+$410 premium</span> + stock gain<br>
+        <span class="cmt">// Total income from AAPL wheel: $1,010 realized</span>
+      </div>
+      <p style="margin-top:10px;">When a trade expires or is closed, SignalForge logs the cycle and prompts you to start the next one — keeping the income machine running.</p>
+    </div>
+
+    <!-- Roll Advisor -->
+    <div class="card">
+      <span class="card-label">Roll Advisor</span>
+      <h3>Smart Roll Suggestions</h3>
+      <p>When a position is approaching expiration or meets roll criteria, a "Roll" badge appears on the trade card. Tap it to see:</p>
+      <ul>
+        <li><strong>Current Position Summary</strong> — What you have now</li>
+        <li><strong>Suggested Roll Targets</strong> — Scored candidates based on premium, DTE, and risk</li>
+        <li><strong>Legs to Adjust</strong> — Table showing what changes</li>
+        <li><strong>Accept Roll Button</strong> — One tap to record the new position</li>
+      </ul>
+
+      <div class="screenshot" id="ss-optionflow-roll">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Roll Advisor with suggestions</div>
+      </div>
+    </div>
+
+    <!-- Closing Positions -->
+    <div class="card">
+      <span class="card-label">Closing Trades</span>
+      <h3>Close Position Sheet</h3>
+      <p>Tap the X on any trade card to close it. The Close Position sheet shows your current position and lets you:</p>
+      <ul>
+        <li>Close at <strong>Market</strong> (current price) or set a <strong>Limit</strong> price</li>
+        <li>Select a <strong>Close Reason:</strong> Profit Target, Stop Loss, Roll, Expired, or Adjustment</li>
+        <li>The final P&L is calculated and added to your income tracking</li>
+      </ul>
+    </div>
+
+    <!-- Income Calendar -->
+    <div class="card">
+      <span class="card-label">Income Calendar</span>
+      <h3>Monthly Income Visualization</h3>
+      <p>Tap the calendar icon in the header to open the Income Calendar:</p>
+      <ul>
+        <li><strong>Calendar Grid</strong> — Monthly view showing income earned on each day</li>
+        <li><strong>Trailing 12-Month Chart</strong> — Bar chart of monthly income totals</li>
+        <li><strong>Monthly Totals</strong> — Summary of premium income by month</li>
+        <li>Tap any date to see which trades opened/closed/expired on that day</li>
+      </ul>
+
+      <div class="screenshot" id="ss-optionflow-calendar">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Income Calendar with monthly totals</div>
+      </div>
+    </div>
+
+    <!-- CSV Import -->
+    <div class="card">
+      <span class="card-label">Import</span>
+      <h3>CSV Import</h3>
+      <p>Already tracking options elsewhere? Use the CSV import to bring in your trade history in bulk. The importer parses your file and creates OptionFlow entries automatically. A success/failure alert confirms the import results.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 7: SETTINGS                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="settings">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <span class="section-title">SETTINGS</span>
+    </div>
+    <p class="section-intro">Customize SignalForge to match your trading style. Access Settings from the gear icon on the Home screen.</p>
+
+    <div class="screenshot" id="ss-settings-full">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Settings panel full view</div>
+    </div>
+
+    <!-- Biometric Lock -->
+    <div class="card">
+      <span class="card-label">Security</span>
+      <h3>Biometric Lock</h3>
+      <p>Toggle on to require Face ID or Touch ID each time you open SignalForge. When enabled, a lock screen with the SignalForge logo and a pulsing biometric icon appears on launch. Tap to authenticate.</p>
+      <div class="tip yellow">
+        <strong>Note:</strong> Widgets may still show data without authentication. The biometric lock protects the main app only.
+      </div>
+    </div>
+
+    <!-- Background Darkness -->
+    <div class="card">
+      <span class="card-label">Appearance</span>
+      <h3>Background Darkness</h3>
+      <p>A slider from bright blue (0) to dark navy (1). Adjust to your preference — brighter for daytime, darker for nighttime trading. The background color changes in real-time as you slide.</p>
+    </div>
+
+    <!-- Refresh Interval -->
+    <div class="card">
+      <span class="card-label">Data</span>
+      <h3>Refresh Interval</h3>
+      <p>How often SignalForge checks for new data in the background:</p>
+      <ul>
+        <li><strong>15 minutes</strong> — Most frequent, best for active trading</li>
+        <li><strong>30 minutes</strong> — Balanced (default)</li>
+        <li><strong>1 hour</strong> — Battery-friendly for swing traders</li>
+      </ul>
+    </div>
+
+    <!-- Notifications -->
+    <div class="card">
+      <span class="card-label">Notifications</span>
+      <h3>Push Notification Settings</h3>
+      <p>Control which notifications you receive:</p>
+      <table class="info-table">
+        <thead><tr><th>Toggle</th><th>What It Controls</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Buy Signal</td><td>Get notified when a stock's signal changes to BUY</td></tr>
+          <tr><td class="label">Sell Signal</td><td>Get notified when a stock's signal changes to SELL</td></tr>
+          <tr><td class="label">Watchlist</td><td>Get notified for watchlist-specific alerts (price targets hit, etc.)</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;">Notifications are delivered via push when signals change — no manual setup needed per stock. The background task scheduler checks on your refresh interval.</p>
+    </div>
+
+    <!-- Signal Thresholds -->
+    <div class="card">
+      <span class="card-label">Signal Tuning</span>
+      <h3>Signal Thresholds</h3>
+      <p>Two sliders that control how aggressive or conservative the signal system is:</p>
+      <ul>
+        <li><strong>Buy Threshold</strong> — Composite score must be ≥ this value to trigger BUY (default: 65)</li>
+        <li><strong>Sell Threshold</strong> — Composite score must be ≤ this value to trigger SELL (default: 35)</li>
+      </ul>
+      <div class="formula">
+        <span class="cmt">// Tighter thresholds (55/45)</span><br>
+        &rarr; More trades, more signals, more noise<br><br>
+        <span class="cmt">// Wider thresholds (75/25)</span><br>
+        &rarr; Fewer trades, higher conviction, more missed moves<br><br>
+        <span class="cmt">// Default (65/35) — 30-point Hold zone</span><br>
+        &rarr; Moderate stance, balanced signal frequency
+      </div>
+
+      <div class="screenshot" id="ss-settings-thresholds">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Signal threshold sliders</div>
+      </div>
+    </div>
+
+    <!-- Other Settings -->
+    <div class="card">
+      <span class="card-label">Additional Settings</span>
+      <h3>Other Configuration Options</h3>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Options</th><th>What It Does</th></tr></thead>
+        <tbody>
+          <tr><td class="label">News Stories Count</td><td>5 / 10 / 15 / 20</td><td>How many news articles to fetch per stock in the Deep Dive and Insights views</td></tr>
+          <tr><td class="label">Option Pricing Method</td><td>Bid / Midpoint / Ask</td><td>Which price to use for option valuation. Midpoint is most common. Bid for conservative; Ask if you're buying.</td></tr>
+          <tr><td class="label">Off-Hours Price</td><td>Checkbox</td><td>Include pre-market and after-hours prices in signal calculations. Useful if you trade extended hours.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Import / Data Management -->
+    <div class="card">
+      <span class="card-label">Data Management</span>
+      <h3>Import & Clear Data</h3>
+      <ul>
+        <li><strong>Import Fidelity CSV</strong> — Import your Fidelity portfolio via CSV file. The importer maps positions and cost basis automatically.</li>
+        <li><strong>Clear All Data</strong> — Red destructive button that removes ALL stocks, ghost trades, and option flow data. Requires confirmation. Use with caution.</li>
+        <li><strong>Reset Ghost Account</strong> — Resets only the simulator/ghost trade data, leaving your watchlist and OptionFlow intact.</li>
+        <li><strong>View Terms & Conditions</strong> — Opens a read-only view of the current T&C.</li>
+      </ul>
+      <div class="tip red">
+        <strong>Warning:</strong> "Clear All Data" is irreversible. Make sure you really want to start fresh before confirming.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding:40px 0 20px; border-top:1px solid rgba(0,200,255,0.08); margin-top:40px;">
+    <div style="font-family:'Orbitron',sans-serif; font-weight:700; font-size:0.9rem; letter-spacing:0.1em; background:linear-gradient(135deg,#00c8ff,#7b50ff,#ff4da6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px;">SIGNAL FORGE</div>
+    <p style="font-size:0.75rem; color:#3d4260;">Crafting Intelligent Signal Solutions</p>
+    <a href="https://wa.me/16784477884" target="_blank" rel="noopener" style="display:inline-block; margin-top:16px; padding:8px 20px; border-radius:20px; background:rgba(37,211,102,0.15); border:1px solid rgba(37,211,102,0.3); color:#25d366; font-size:0.8rem; font-weight:600; text-decoration:none; transition:background 0.3s;">
+      For More Info — WhatsApp Us
+    </a>
+  </div>
+
+</div>
+
+<script>
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  function updateActiveNav() {
+    let current = '';
+    const scrollTop = window.scrollY + 150;
+
+    sections.forEach(section => {
+      if (section.offsetTop <= scrollTop) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-tab') === current) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav);
+  window.addEventListener('load', updateActiveNav);
+
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('scrollProgress').style.width = scrolled + '%';
+  });
+</script>
+
+</body>
+</html>
