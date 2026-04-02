@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wheel Mistro — Automated Wheel Strategy Engine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', sans-serif;
+    background: #0a0e1a;
+    color: #e0e6f0;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 20% 10%, #1a0f2e 0%, #0a0e1a 55%),
+                radial-gradient(ellipse at 80% 85%, #0f1b3d 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(185, 154, 51, 0.15);
+    padding: 0 24px;
+  }
+
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .top-bar .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, #b39a33 0%, #e6c84d 50%, #b39a33 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+  }
+
+  .top-bar .back-link {
+    font-size: 0.85rem;
+    color: rgba(185, 154, 51, 0.6);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .top-bar .back-link:hover { color: #e6c84d; }
+
+  /* ── NAVIGATION ── */
+  .nav-bar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    background: rgba(10, 14, 26, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(185, 154, 51, 0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-bar::-webkit-scrollbar { height: 0; }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 16px;
+    min-width: max-content;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 18px;
+    text-decoration: none;
+    color: rgba(224, 230, 240, 0.45);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .nav-item:hover { color: rgba(224, 230, 240, 0.8); }
+  .nav-item.active { color: #e6c84d; border-bottom-color: #e6c84d; }
+
+  .nav-icon { font-size: 1.3rem; line-height: 1; }
+
+  .nav-item[data-tab="dashboard"].active { color: #e6c84d; border-bottom-color: #e6c84d; }
+  .nav-item[data-tab="positions"].active { color: #2dcc70; border-bottom-color: #2dcc70; }
+  .nav-item[data-tab="scanner"].active { color: #66cccc; border-bottom-color: #66cccc; }
+  .nav-item[data-tab="backtest"].active { color: #9966e6; border-bottom-color: #9966e6; }
+  .nav-item[data-tab="settings"].active { color: #e68a19; border-bottom-color: #e68a19; }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 140px 24px 80px;
+  }
+
+  /* ── HERO ── */
+  .guide-hero {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .guide-hero .logo-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, #b39a33 0%, #e6c84d 40%, #b39a33 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(185,154,51,0.25));
+  }
+
+  .guide-hero .subtitle {
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-weight: 300;
+    color: rgba(224,230,240,0.55);
+    letter-spacing: 0.06em;
+    margin-top: 0.6em;
+  }
+
+  .guide-hero .intro {
+    font-size: 0.9rem;
+    color: rgba(224,230,240,0.4);
+    line-height: 1.7;
+    max-width: 680px;
+    margin: 1.5em auto 0;
+  }
+
+  /* ── WHEEL DIAGRAM ── */
+  .wheel-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 30px auto;
+    max-width: 700px;
+  }
+
+  .wheel-phase {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .wheel-arrow {
+    color: rgba(224,230,240,0.25);
+    font-size: 1.2rem;
+  }
+
+  .wp-csp { background: rgba(230,138,25,0.15); border: 1px solid rgba(230,138,25,0.3); color: #e68a19; }
+  .wp-own { background: rgba(242,195,6,0.15); border: 1px solid rgba(242,195,6,0.3); color: #f2c306; }
+  .wp-cc { background: rgba(45,204,112,0.15); border: 1px solid rgba(45,204,112,0.3); color: #2dcc70; }
+  .wp-done { background: rgba(89,84,159,0.15); border: 1px solid rgba(89,84,159,0.3); color: #8b7fc7; }
+  .wp-idle { background: rgba(224,230,240,0.06); border: 1px solid rgba(224,230,240,0.1); color: rgba(224,230,240,0.4); }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 130px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(185,154,51,0.15);
+  }
+
+  .section-icon { font-size: 2rem; line-height: 1; }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    letter-spacing: 0.06em;
+  }
+
+  #dashboard .section-title { color: #e6c84d; }
+  #positions .section-title { color: #2dcc70; }
+  #scanner .section-title { color: #66cccc; }
+  #backtest .section-title { color: #9966e6; }
+  #settings .section-title { color: #e68a19; }
+
+  .section-intro {
+    font-size: 0.9rem;
+    color: rgba(224,230,240,0.55);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(15, 20, 40, 0.6);
+    border: 1px solid rgba(185,154,51,0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .card-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #b39a33;
+    background: rgba(185,154,51,0.12);
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .card p, .card li {
+    font-size: 0.85rem;
+    color: #9aa0b8;
+    line-height: 1.65;
+  }
+
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { padding: 6px 0 6px 20px; position: relative; }
+  .card ul li::before {
+    content: '›';
+    position: absolute;
+    left: 4px;
+    color: #b39a33;
+    font-weight: 700;
+  }
+
+  .card ol { padding-left: 20px; }
+  .card ol li { font-size: 0.85rem; color: #9aa0b8; line-height: 1.8; }
+
+  /* ── TABLES ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin-top: 12px;
+  }
+
+  .info-table th {
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #5a6080;
+    padding: 8px;
+    border-bottom: 1px solid #1e2340;
+  }
+
+  .info-table td {
+    padding: 8px;
+    border-bottom: 1px solid #141830;
+    vertical-align: top;
+    color: #9aa0b8;
+  }
+
+  .info-table tr:last-child td { border-bottom: none; }
+  .info-table .label { font-weight: 600; color: #c8cde0; white-space: nowrap; }
+
+  .buy { color: #2dcc70; }
+  .sell { color: #f24545; }
+  .hold { color: #f2c306; }
+  .orange { color: #e68a19; }
+  .cyan { color: #66cccc; }
+  .purple { color: #9966e6; }
+
+  /* ── SCREENSHOT PLACEHOLDERS ── */
+  .screenshot {
+    border: 2px dashed rgba(185,154,51,0.2);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    margin: 20px 0;
+    background: rgba(185,154,51,0.02);
+  }
+
+  .screenshot .camera { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+
+  .screenshot .caption {
+    font-size: 0.75rem;
+    color: rgba(185,154,51,0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .screenshot img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* ── TIPS ── */
+  .tip {
+    background: rgba(185,154,51,0.08);
+    border-left: 3px solid #b39a33;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.82rem;
+    color: #9aa0b8;
+    margin: 16px 0;
+  }
+
+  .tip strong { color: #c8cde0; }
+  .tip.green { background: rgba(45,204,112,0.08); border-left-color: #2dcc70; }
+  .tip.orange { background: rgba(230,138,25,0.08); border-left-color: #e68a19; }
+  .tip.red { background: rgba(242,69,69,0.08); border-left-color: #f24545; }
+  .tip.purple { background: rgba(153,102,230,0.08); border-left-color: #9966e6; }
+
+  /* ── FORMULA BOX ── */
+  .formula {
+    background: #0d1020;
+    border: 1px solid #1a1f38;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.75rem;
+    color: #a5b4d4;
+    margin: 14px 0;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  .formula .kw { color: #c084fc; }
+  .formula .num { color: #fbbf24; }
+  .formula .cmt { color: #4a5570; }
+  .formula .grn { color: #2dcc70; }
+  .formula .red { color: #f24545; }
+  .formula .org { color: #e68a19; }
+
+  /* ── SUBSECTION ── */
+  .subsection {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .subsection-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #c8cde0;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subsection-title .icon { font-size: 1.1rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .content { padding: 130px 16px 60px; }
+    .card { padding: 18px; }
+    .nav-item { padding: 8px 12px; font-size: 0.58rem; }
+    .nav-icon { font-size: 1.1rem; }
+    .info-table { font-size: 0.72rem; }
+    .wheel-diagram { gap: 6px; }
+    .wheel-phase { padding: 8px 12px; font-size: 0.7rem; }
+  }
+
+  /* ── SCROLL PROGRESS ── */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #b39a33, #e6c84d, #b39a33);
+    z-index: 200;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span class="logo-text">WHEEL MISTRO</span>
+    <a href="index.html" class="back-link">&larr; Signal Forge Home</a>
+  </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a class="nav-item active" data-tab="dashboard" href="#dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a class="nav-item" data-tab="positions" href="#positions">
+      <span class="nav-icon">🎯</span> Positions
+    </a>
+    <a class="nav-item" data-tab="scanner" href="#scanner">
+      <span class="nav-icon">🔍</span> IV Scanner
+    </a>
+    <a class="nav-item" data-tab="backtest" href="#backtest">
+      <span class="nav-icon">📈</span> Backtest
+    </a>
+    <a class="nav-item" data-tab="settings" href="#settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="content">
+
+  <!-- Hero -->
+  <div class="guide-hero">
+    <div class="logo-text">WHEEL MISTRO</div>
+    <div class="subtitle">Automated Wheel Strategy Engine</div>
+    <p class="intro">Wheel Mistro automates the wheel options strategy — systematically selling cash-secured puts and covered calls to generate consistent premium income. This guide walks you through every screen and feature.</p>
+
+    <!-- Wheel Phase Diagram -->
+    <div class="wheel-diagram">
+      <div class="wheel-phase wp-idle">⏸ IDLE</div>
+      <span class="wheel-arrow">→</span>
+      <div class="wheel-phase wp-csp">↓ SELL PUT</div>
+      <span class="wheel-arrow">→</span>
+      <div class="wheel-phase wp-own">✓ ASSIGNED</div>
+      <span class="wheel-arrow">→</span>
+      <div class="wheel-phase wp-cc">↑ SELL CALL</div>
+      <span class="wheel-arrow">→</span>
+      <div class="wheel-phase wp-done">→ CALLED AWAY</div>
+      <span class="wheel-arrow">→</span>
+      <div class="wheel-phase wp-idle">⏸ REPEAT</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 1: DASHBOARD                    -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="dashboard">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <span class="section-title">DASHBOARD</span>
+    </div>
+    <p class="section-intro">Your wheel strategy command center. The Dashboard shows your net liquidation value, cash, premium collected, active wheels, and recent trades — everything you need to monitor your income machine at a glance.</p>
+
+    <div class="screenshot" id="ss-wm-dashboard">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Dashboard full view with active wheels</div>
+    </div>
+
+    <!-- Header Controls -->
+    <div class="card">
+      <span class="card-label">Controls</span>
+      <h3>Header Bar</h3>
+      <table class="info-table">
+        <thead><tr><th>Control</th><th>Icon</th><th>What It Does</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Auto-Execute Toggle</td><td>▶ / ⏸</td><td>Start or pause automatic wheel execution. When ON, the engine runs on your configured refresh interval (default: 15 min), checking for rolls, expirations, and new writes. Shows a confirmation dialog before enabling.</td></tr>
+          <tr><td class="label">Manual Execute</td><td>↻</td><td>Run one wheel cycle immediately — checks all positions for rolls, expirations, and new option writes.</td></tr>
+          <tr><td class="label">Help</td><td>?</td><td>Opens contextual help explaining the Dashboard.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- NLV Card -->
+    <div class="card">
+      <span class="card-label">Portfolio Summary</span>
+      <h3>Net Liquidation Value (NLV)</h3>
+      <p>The hero card shows your total account value — cash + stock holdings + option positions. Below it, a 6-card stat grid provides key metrics:</p>
+      <table class="info-table">
+        <thead><tr><th>Metric</th><th>What It Shows</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Cash</td><td>Available cash for new puts (must cover potential assignment)</td></tr>
+          <tr><td class="label">Stocks</td><td>Total value of shares you own from assignments</td></tr>
+          <tr><td class="label">Premium</td><td>Cumulative premium collected across all trades (your income)</td></tr>
+          <tr><td class="label">Wheels</td><td>Number of actively cycling positions</td></tr>
+          <tr><td class="label">Positions</td><td>Total symbols in the portfolio</td></tr>
+          <tr><td class="label">Trades</td><td>Total trade count (STO, rolls, assignments, expirations)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Wheel Status -->
+    <div class="card">
+      <span class="card-label">Live Wheels</span>
+      <h3>Wheel Status List</h3>
+      <p>Each active position shows its current wheel phase with a color-coded icon and badge:</p>
+      <table class="info-table">
+        <thead><tr><th>Phase</th><th>Icon</th><th>Color</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Selling Puts (CSP)</td><td>↓</td><td class="orange">Orange</td><td>Cash-secured put is active — collecting premium while waiting for potential assignment</td></tr>
+          <tr><td class="label">Assigned (OWN)</td><td>✓</td><td class="hold">Yellow</td><td>Put was assigned — you now own 100 shares per contract. Ready to sell calls.</td></tr>
+          <tr><td class="label">Selling Calls (CC)</td><td>↑</td><td class="buy">Green</td><td>Covered call is active — collecting premium on shares you own</td></tr>
+          <tr><td class="label">Called Away</td><td>→</td><td class="purple">Blue</td><td>Call was exercised — shares sold at strike. Wheel cycle complete.</td></tr>
+          <tr><td class="label">Idle</td><td>⏸</td><td style="color:rgba(224,230,240,0.4);">Gray</td><td>No active option — next cycle will write a new put to restart the wheel.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;">Each row also shows the active option details: expiration date, type (P/C), delta, DTE, and cumulative premium collected for that symbol.</p>
+
+      <div class="screenshot" id="ss-wm-wheels">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Wheel status list showing mixed phases</div>
+      </div>
+    </div>
+
+    <!-- Recent Trades -->
+    <div class="card">
+      <span class="card-label">Trade Feed</span>
+      <h3>Recent Trades</h3>
+      <p>The 10 most recent trades with color-coded action badges:</p>
+      <table class="info-table">
+        <thead><tr><th>Action</th><th>Color</th><th>What Happened</th></tr></thead>
+        <tbody>
+          <tr><td class="label">STO</td><td class="buy">Green</td><td>Sell-to-Open — new option written, premium received</td></tr>
+          <tr><td class="label">BTC</td><td class="sell">Red</td><td>Buy-to-Close — option closed early (usually to roll)</td></tr>
+          <tr><td class="label">ROLL</td><td class="cyan">Cyan</td><td>Rolled to new strike/expiration — closed old, opened new</td></tr>
+          <tr><td class="label">ASSIGN</td><td class="hold">Yellow</td><td>Put assigned — shares purchased at strike price</td></tr>
+          <tr><td class="label">CALLED</td><td class="purple">Purple</td><td>Call exercised — shares sold at strike, cycle complete</td></tr>
+          <tr><td class="label">EXPIRED</td><td style="color:rgba(224,230,240,0.5);">Gray</td><td>Option expired worthless — full premium kept</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:8px;">Each trade shows the P&L impact and a relative timestamp (e.g., "2h ago").</p>
+    </div>
+
+    <!-- Pull to Refresh -->
+    <div class="tip green">
+      <strong>Tip:</strong> Pull down on the Dashboard to refresh stock prices without executing a trade cycle. Use the manual execute button (↻) when you want to actually trigger rolls and new writes.
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 2: POSITIONS                    -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="positions">
+    <div class="section-header">
+      <span class="section-icon">🎯</span>
+      <span class="section-title">POSITIONS</span>
+    </div>
+    <p class="section-intro">Manage and monitor every symbol in your wheel portfolio. View active options, track premiums by symbol, sort by any metric, and drill into detailed trade history for each position.</p>
+
+    <div class="screenshot" id="ss-wm-positions">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Positions list sorted by sector</div>
+    </div>
+
+    <!-- Sort Controls -->
+    <div class="card">
+      <span class="card-label">Sorting</span>
+      <h3>Sort Controls</h3>
+      <p>Four sort buttons at the top. Tap once to sort ascending, tap again to reverse:</p>
+      <ul>
+        <li><strong>Symbol</strong> — Alphabetical</li>
+        <li><strong>Sector</strong> — Groups positions by sector with colored section headers (Tech, Semis, Financials, Energy, etc.)</li>
+        <li><strong>P&L</strong> — By open option P&L (best/worst first)</li>
+        <li><strong>DTE</strong> — By days to expiration (soonest first to catch upcoming rolls)</li>
+      </ul>
+    </div>
+
+    <!-- Position Row -->
+    <div class="card">
+      <span class="card-label">Position Row</span>
+      <h3>Reading a Position Card</h3>
+      <p>Each position row shows everything you need at a glance:</p>
+      <table class="info-table">
+        <thead><tr><th>Element</th><th>Location</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Phase Icon</td><td>Left</td><td>Color-coded wheel phase indicator (↓ ✓ ↑ → ⏸)</td></tr>
+          <tr><td class="label">Symbol + Phase Badge</td><td>Top left</td><td>Ticker symbol with a pill badge showing the phase name</td></tr>
+          <tr><td class="label">Shares Badge</td><td>Below symbol</td><td>Cyan badge showing share count (e.g., "100sh") — only when you own shares</td></tr>
+          <tr><td class="label">Contract Label</td><td>Middle</td><td>Active option: expiration date, type (P/C), strike price</td></tr>
+          <tr><td class="label">Delta Badge</td><td>Near contract</td><td>Current option delta</td></tr>
+          <tr><td class="label">DTE Badge</td><td>Near contract</td><td>Days to expiration — <span class="sell">red if ≤15</span>, <span class="hold">yellow otherwise</span></td></tr>
+          <tr><td class="label">Current Price</td><td>Right column</td><td>Live stock price</td></tr>
+          <tr><td class="label">Option P&L</td><td>Right column</td><td>Open P&L on the active option ($ and %)</td></tr>
+          <tr><td class="label">Total Premium</td><td>Far right</td><td>Cumulative premium collected for this symbol</td></tr>
+          <tr><td class="label">Cycle Count</td><td>Below premium</td><td>Number of completed wheel cycles (e.g., "×3")</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;"><strong>Swipe left</strong> on any row to delete that position from your portfolio.</p>
+      <p><strong>Tap</strong> any row to open the Position Detail sheet.</p>
+    </div>
+
+    <!-- Position Detail -->
+    <div class="card">
+      <span class="card-label">Detail Sheet</span>
+      <h3>Position Detail</h3>
+      <p>Tap any position to see the full breakdown:</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📋</span> Header Card</div>
+        <ul>
+          <li>Phase icon + name, cycle count (e.g., "Cycle #3")</li>
+          <li>Current stock price, portfolio weight %</li>
+          <li>Stats: premium collected, unrealized P&L, wheel cycles completed</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📄</span> Active Option Card</div>
+        <ul>
+          <li>Contract label (strike + type + expiration)</li>
+          <li>Metrics: delta, DTE, implied volatility</li>
+          <li>P&L in dollars and percentage</li>
+          <li><strong>Roll Eligibility Bars:</strong>
+            <ul style="margin-top:4px;">
+              <li>P&L progress bar toward the 90% profit target</li>
+              <li>DTE countdown bar toward the 15-day roll trigger</li>
+            </ul>
+          </li>
+        </ul>
+        <p style="margin-top:8px;">If no option is active, shows "NO ACTIVE OPTION — Next cycle will write a new option."</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📦</span> Shares Card (if assigned)</div>
+        <ul>
+          <li>Share quantity, average cost basis, market value, unrealized P&L</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📜</span> Trade History</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Full chronological list of all closed trades for this symbol — STO, BTC, ROLL, ASSIGN, CALLED, EXPIRED — with contract label, P&L, and date.</p>
+      </div>
+
+      <div class="screenshot" id="ss-wm-detail">
+        <div class="camera">📷</div>
+        <div class="caption">Screenshot: Position Detail with roll eligibility bars</div>
+      </div>
+    </div>
+
+    <!-- Adding Symbols -->
+    <div class="card">
+      <span class="card-label">Add Symbol</span>
+      <h3>Adding a New Position</h3>
+      <p>Tap the <strong>+</strong> button on the Positions screen. You can:</p>
+      <ol>
+        <li><strong>Type a symbol manually</strong> — enter the ticker and set a portfolio weight (5%–100% in 5% steps)</li>
+        <li><strong>Pick from IV Suggestions</strong> — the built-in IV Scanner shows high-IV candidates ranked by premium yield (see <a href="#scanner" style="color:#66cccc;">IV Scanner section</a>)</li>
+        <li>Tap <strong>Add</strong> — the position is created, price is fetched, and the first wheel cycle runs automatically</li>
+      </ol>
+      <div class="tip">
+        <strong>How weights work:</strong> Portfolio weight determines how much capital is allocated to each symbol for position sizing. Weights auto-normalize to sum to 100%. A 20% weight on a $100K account means up to $20K in buying power for that symbol's puts.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 3: IV SCANNER                   -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="scanner">
+    <div class="section-header">
+      <span class="section-icon">🔍</span>
+      <span class="section-title">IV SCANNER</span>
+    </div>
+    <p class="section-intro">Find the best wheel candidates by implied volatility. The IV Scanner ranks 64 popular wheel-friendly tickers by their IV, estimated 30-day premium, and annualized yield — so you can deploy capital where it earns the most.</p>
+
+    <div class="screenshot" id="ss-wm-scanner">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: IV Scanner with suggestions ranked by IV</div>
+    </div>
+
+    <!-- Universe -->
+    <div class="card">
+      <span class="card-label">Universe</span>
+      <h3>64-Ticker Scan Universe</h3>
+      <p>The scanner covers a curated set of wheel-friendly stocks across sectors:</p>
+      <table class="info-table">
+        <thead><tr><th>Sector</th><th>Tickers</th></tr></thead>
+        <tbody>
+          <tr><td class="label" style="color:#59549f;">Tech</td><td>AAPL, MSFT, AMZN, GOOGL, META, TSLA, PLTR, SNAP, and more</td></tr>
+          <tr><td class="label" style="color:#9966e6;">Semis</td><td>NVDA, AMD, INTC, MU, AVGO, QCOM, ARM</td></tr>
+          <tr><td class="label" style="color:#b39a33;">Financials</td><td>JPM, BAC, GS, WFC, SCHW</td></tr>
+          <tr><td class="label" style="color:#e68a19;">Energy</td><td>XOM, CVX, OXY</td></tr>
+          <tr><td class="label" style="color:#d95ad5;">Consumer</td><td>NKE, DIS, SBUX, WMT, COST</td></tr>
+          <tr><td class="label" style="color:#2dcc70;">Healthcare</td><td>PFE, JNJ</td></tr>
+          <tr><td class="label" style="color:#f2c306;">ETFs</td><td>SPY, QQQ, IWM, TQQQ</td></tr>
+          <tr><td class="label" style="color:#f24545;">High-IV</td><td>MSTR, RIVN, LCID, GME, AMC</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Suggestion Row -->
+    <div class="card">
+      <span class="card-label">Reading Results</span>
+      <h3>IV Suggestion Row</h3>
+      <p>Each scanned symbol shows:</p>
+      <table class="info-table">
+        <thead><tr><th>Column</th><th>What It Shows</th></tr></thead>
+        <tbody>
+          <tr><td class="label">IV Rank Bar</td><td>Visual bar (0–1) colored by rank: <span class="sell">red = highest IV</span>, <span class="orange">orange</span>, <span class="hold">yellow</span>, <span class="buy">green = lowest</span>. Higher IV = more premium.</td></tr>
+          <tr><td class="label">Symbol</td><td>Ticker with sector color accent</td></tr>
+          <tr><td class="label">Price</td><td>Current stock price</td></tr>
+          <tr><td class="label">IV %</td><td>Annualized implied volatility from ATM put</td></tr>
+          <tr><td class="label">Yield %</td><td>Annualized premium as a percentage of stock price — your theoretical income rate</td></tr>
+          <tr><td class="label">~30d</td><td>Estimated 30-day ATM put premium in dollars</td></tr>
+          <tr><td class="label">Status</td><td>✓ if already in your portfolio, + if available to add</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Scan Modes -->
+    <div class="card">
+      <span class="card-label">Scan Modes</span>
+      <h3>Quick Scan vs Full Scan</h3>
+      <ul>
+        <li><strong>Quick Scan</strong> — 20-symbol curated set. Faster results, covers the most popular wheel tickers.</li>
+        <li><strong>All</strong> — Full 64-symbol universe. More comprehensive but takes longer.</li>
+        <li><strong>Refresh</strong> — Re-scan with fresh market data.</li>
+      </ul>
+      <p style="margin-top:10px;"><strong>Sort results by:</strong> Name, Sector, IV (highest first), or Yield (highest first). Tap any sort button again to reverse direction.</p>
+    </div>
+
+    <!-- How IV Scanning Works -->
+    <div class="card">
+      <span class="card-label">Under the Hood</span>
+      <h3>How the Scanner Works</h3>
+      <div class="formula">
+        <span class="cmt">// For each symbol in the universe:</span><br>
+        1. Fetch stock price from Yahoo Finance<br>
+        2. Fetch option chain (nearest monthly expiration)<br>
+        3. Find ATM put (closest strike to current price)<br>
+        4. Extract IV from ATM put<br><br>
+        <span class="cmt">// Calculate estimated metrics:</span><br>
+        premium_30d = IV &times; &radic;(<span class="num">30</span>/<span class="num">365</span>) &times; price &times; <span class="num">0.4</span><br>
+        annualized_yield = (premium / price) &times; (<span class="num">365</span> / DTE)<br>
+        iv_rank = percentile within scanned universe
+      </div>
+      <div class="tip green">
+        <strong>Strategy tip:</strong> Look for stocks with IV Rank above 0.5 and Yield above 15%. These are the sweet spots where premium income justifies the assignment risk.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 4: BACKTEST                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="backtest">
+    <div class="section-header">
+      <span class="section-icon">📈</span>
+      <span class="section-title">BACKTEST ANALYZER</span>
+    </div>
+    <p class="section-intro">Test the wheel strategy on historical data before deploying real capital. Run simulations on any symbol over 6 months to 3 years and analyze returns, drawdowns, Sharpe ratio, and every simulated trade.</p>
+
+    <div class="screenshot" id="ss-wm-backtest">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Backtest results — Summary tab</div>
+    </div>
+
+    <!-- Running a Backtest -->
+    <div class="card">
+      <span class="card-label">How To</span>
+      <h3>Running a Backtest</h3>
+      <ol>
+        <li>Enter a <strong>symbol</strong> (or tap a Quick Launch chip: AAPL, NVDA, SPY, MU, AMD)</li>
+        <li>Select a <strong>period</strong>: 6 months, 1 year, 2 years, or 3 years</li>
+        <li>Tap <strong>RUN</strong> — the engine fetches historical prices and simulates the full wheel cycle</li>
+      </ol>
+      <p style="margin-top:10px;">The backtest uses your current Settings (delta, DTE, roll targets, etc.), so you can tweak settings and re-run to compare results.</p>
+    </div>
+
+    <!-- Results Tabs -->
+    <div class="card">
+      <span class="card-label">Results</span>
+      <h3>Three Result Tabs</h3>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📋</span> Summary Tab</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">A 3×3 metrics grid plus a settings card:</p>
+        <table class="info-table">
+          <thead><tr><th>Metric</th><th>What It Tells You</th></tr></thead>
+          <tbody>
+            <tr><td class="label">Final NLV</td><td>Ending account value</td></tr>
+            <tr><td class="label">Total Return</td><td>Net percentage gain/loss (large, color-coded)</td></tr>
+            <tr><td class="label">Annualized %</td><td>Annualized return for comparison across periods</td></tr>
+            <tr><td class="label">Premium Collected</td><td>Total option premium earned</td></tr>
+            <tr><td class="label">Max Drawdown</td><td>Largest peak-to-trough decline — your worst-case scenario</td></tr>
+            <tr><td class="label">Sharpe Ratio</td><td>Risk-adjusted return. Above 1.0 = good, above 2.0 = excellent.</td></tr>
+            <tr><td class="label">Win Rate</td><td>% of trades that ended profitably</td></tr>
+            <tr><td class="label">Trade Count</td><td>Total trades executed in the simulation</td></tr>
+            <tr><td class="label">Cycle Count</td><td>Completed wheel cycles</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📈</span> Chart Tab</div>
+        <ul>
+          <li><strong>Equity Curve</strong> — Gold line chart showing NLV over time with area fill. This is your account growth trajectory.</li>
+          <li><strong>Cumulative Premium</strong> — Green area chart showing premium accumulation. Should be steadily rising — this is your income line.</li>
+        </ul>
+
+        <div class="screenshot" id="ss-wm-backtest-chart">
+          <div class="camera">📷</div>
+          <div class="caption">Screenshot: Backtest Chart tab — equity curve + premium</div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📜</span> Trades Tab</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Reverse chronological list of every simulated trade: STO PUT/CALL, ROLL, ASSIGNED, CALLED, EXPIRED. Each shows the strike, P&L impact, and date. Use this to understand <em>why</em> the strategy performed the way it did.</p>
+      </div>
+    </div>
+
+    <!-- Black-Scholes Note -->
+    <div class="card">
+      <span class="card-label">Methodology</span>
+      <h3>How the Backtest Engine Works</h3>
+      <p>The engine replays history day-by-day, simulating the exact same logic as live execution:</p>
+      <ol>
+        <li>Mark daily snapshot (NLV, cash, stock value, premium)</li>
+        <li>Check active option: if DTE = 0, handle expiration/assignment/call-away</li>
+        <li>Check roll eligibility: if P&L target hit or DTE trigger, roll</li>
+        <li>Write new option if none active: calculate strike + premium via Black-Scholes</li>
+      </ol>
+      <div class="formula">
+        <span class="cmt">// Historical Volatility for pricing:</span><br>
+        daily_returns = log(price[t] / price[t-1])<br>
+        annual_vol = stdev(daily_returns) &times; &radic;<span class="num">252</span><br><br>
+        <span class="cmt">// Black-Scholes for option pricing (when chain unavailable):</span><br>
+        d1 = [log(S/K) + (r + &sigma;&sup2;/<span class="num">2</span>)T] / (&sigma;&radic;T)<br>
+        d2 = d1 - &sigma;&radic;T
+      </div>
+      <div class="tip purple">
+        <strong>Note:</strong> Backtests use historical volatility rather than real-time IV, and assume perfect fills. Actual results will vary due to slippage, bid-ask spreads, and IV changes.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SECTION 5: SETTINGS                     -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="settings">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <span class="section-title">SETTINGS</span>
+    </div>
+    <p class="section-intro">Fine-tune every aspect of the wheel engine. Settings are organized into collapsible sections and are saved automatically. Changes take effect on the next execution cycle.</p>
+
+    <div class="screenshot" id="ss-wm-settings">
+      <div class="camera">📷</div>
+      <div class="caption">Screenshot: Settings panel showing key sections</div>
+    </div>
+
+    <!-- Account -->
+    <div class="card">
+      <span class="card-label">Account</span>
+      <h3>Account Settings</h3>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Starting Cash</td><td>$100,000</td><td>Initial account balance for the simulation</td></tr>
+          <tr><td class="label">Margin Usage</td><td>50%</td><td>Fraction of account used for buying power (0% = cash only, 100% = full margin)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Target -->
+    <div class="card">
+      <span class="card-label">Target</span>
+      <h3>Option Selection Targets</h3>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Target Delta</td><td>0.30</td><td>Option delta to target when writing (0.30 = ~70% probability OTM). Lower = safer but less premium.</td></tr>
+          <tr><td class="label">Target DTE</td><td>45 days</td><td>Target days to expiration. 45 DTE is the sweet spot for theta decay.</td></tr>
+          <tr><td class="label">Max DTE</td><td>—</td><td>Maximum allowed expiration distance</td></tr>
+          <tr><td class="label">Min Open Interest</td><td>—</td><td>Minimum liquidity threshold for contract selection</td></tr>
+          <tr><td class="label">Minimum Credit</td><td>$0.05</td><td>Won't write options with less premium than this per share</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <strong>Why 0.30 delta and 45 DTE?</strong> At 0.30 delta, you have roughly a 70% chance of the option expiring OTM (keeping full premium). At 45 DTE, theta decay accelerates, so you capture the most time value. This is the industry-standard starting point for wheel strategies.
+      </div>
+    </div>
+
+    <!-- Roll When -->
+    <div class="card">
+      <span class="card-label">Roll When</span>
+      <h3>Roll Trigger Settings</h3>
+      <p>These settings control when the engine automatically rolls an option to a new expiration:</p>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">P&L Target</td><td>90%</td><td>Roll when P&L reaches this percentage of max profit. At 90%, you capture most of the premium and reset time value.</td></tr>
+          <tr><td class="label">DTE Trigger</td><td>15 days</td><td>Roll when DTE drops below this. Avoids gamma risk near expiration.</td></tr>
+          <tr><td class="label">Min P&L for DTE Roll</td><td>—</td><td>Minimum profit needed to allow a DTE-triggered roll (prevents rolling losers)</td></tr>
+          <tr><td class="label">Roll Puts ITM</td><td>Toggle</td><td>Auto-roll puts that go in-the-money (avoid assignment)</td></tr>
+          <tr><td class="label">Roll Calls ITM</td><td>Toggle</td><td>Auto-roll calls that go ITM (avoid being called away)</td></tr>
+          <tr><td class="label">Credit Only</td><td>Toggle</td><td>Only roll if the new position generates a net credit</td></tr>
+          <tr><td class="label">High Water Mark</td><td>Toggle</td><td>Don't sell calls below your cost basis — protects against selling at a loss</td></tr>
+        </tbody>
+      </table>
+      <div class="formula">
+        <span class="cmt">// Roll decision logic:</span><br>
+        <span class="kw">if</span> option_pnl_pct >= <span class="num">0.90</span> &rarr; <span class="grn">ROLL (profit target)</span><br>
+        <span class="kw">if</span> dte <= <span class="num">15</span> &amp;&amp; pnl >= min_pnl &rarr; <span class="org">ROLL (DTE trigger)</span><br>
+        <span class="kw">if</span> put_itm &amp;&amp; roll_puts_itm &rarr; <span class="red">ROLL (ITM defense)</span>
+      </div>
+    </div>
+
+    <!-- Write When -->
+    <div class="card">
+      <span class="card-label">Write When</span>
+      <h3>Write Condition Filters</h3>
+      <p>Optional behavioral filters that control <em>when</em> the engine writes new options:</p>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Write Puts on Red Days</td><td>Only sell puts when the stock is down for the day (buy the dip mentality)</td></tr>
+          <tr><td class="label">Write Calls on Green Days</td><td>Only sell calls when the stock is up (sell the rip mentality)</td></tr>
+          <tr><td class="label">Call Cap Factor</td><td>Fraction of owned shares to write calls against (e.g., 0.5 = cover only half)</td></tr>
+          <tr><td class="label">Max New Contracts %</td><td>Maximum position size as a % of NLV for any single new trade</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Write Threshold -->
+    <div class="card">
+      <span class="card-label">Write Threshold</span>
+      <h3>Volatility Gating</h3>
+      <p>Require a minimum level of daily volatility before writing options. This prevents selling cheap premium in flat markets:</p>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Write Threshold %</td><td>Minimum daily price change (%) required to trigger writes</td></tr>
+          <tr><td class="label">Sigma Threshold</td><td>Minimum standard deviations of daily move required</td></tr>
+          <tr><td class="label">Std Dev Window</td><td>Lookback period (days) for calculating daily volatility</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Advanced Features -->
+    <div class="card">
+      <span class="card-label">Advanced</span>
+      <h3>Advanced Features</h3>
+      <p>Three advanced modules for sophisticated portfolio management (each has an enable toggle):</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🛡️</span> VIX Hedging</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Automatically buy protective VIX calls when portfolio risk is elevated. Configure delta, DTE, allocation %, and close trigger level.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">💵</span> Cash Management</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Park idle cash in a money market ETF (default: SGOV) to earn yield while waiting for assignments. Configure buy/sell thresholds.</p>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📊</span> Regime Rebalance</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Adjust portfolio weights dynamically based on market regime (bull/bear/sideways). Configure lookback period and tolerance bands.</p>
+      </div>
+    </div>
+
+    <!-- Execution & Display -->
+    <div class="card">
+      <span class="card-label">Execution & Display</span>
+      <h3>Other Settings</h3>
+      <table class="info-table">
+        <thead><tr><th>Setting</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Refresh Interval</td><td>15 min</td><td>How often the engine checks for rolls and new writes when auto-execute is on</td></tr>
+          <tr><td class="label">Auto-Execute</td><td>Off</td><td>Enable/disable the automatic execution timer</td></tr>
+          <tr><td class="label">Background Darkness</td><td>50%</td><td>Dark theme intensity slider (0% = lighter, 100% = deepest dark)</td></tr>
+          <tr><td class="label">Reset Simulation</td><td>—</td><td>Destructive: clears all positions, trades, snapshots. Resets cash to starting amount. Requires confirmation.</td></tr>
+        </tbody>
+      </table>
+      <div class="tip red">
+        <strong>Warning:</strong> "Reset Simulation" is irreversible. All positions, trade history, and snapshots will be permanently deleted.
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  GETTING STARTED                          -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="getting-started" style="scroll-margin-top:130px;">
+    <div class="section-header">
+      <span class="section-icon">🚀</span>
+      <span class="section-title" style="color:#e6c84d;">GETTING STARTED</span>
+    </div>
+
+    <div class="card">
+      <span class="card-label">Quick Start</span>
+      <h3>Your First Wheel in 5 Steps</h3>
+      <ol>
+        <li><strong>Configure your account</strong> — Go to Settings, set your starting cash and margin preferences</li>
+        <li><strong>Scan for candidates</strong> — Go to Positions → tap + → browse IV Suggestions. Look for stocks with high yield and IV rank above 0.5</li>
+        <li><strong>Add 3-5 symbols</strong> — Start small. Set equal weights (20% each). The engine will allocate capital accordingly.</li>
+        <li><strong>Run your first cycle</strong> — Tap the manual execute button (↻) on the Dashboard. The engine will write puts on each position.</li>
+        <li><strong>Monitor & learn</strong> — Watch the phases progress. Check the Dashboard daily. When positions roll or get assigned, the engine handles it automatically.</li>
+      </ol>
+      <div class="tip green">
+        <strong>Beginner tip:</strong> Start with a 0.25 delta (safer) and well-known stocks like AAPL or SPY. As you get comfortable with the wheel mechanics, you can increase delta for more premium or add higher-IV names.
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-label">Workflow</span>
+      <h3>Recommended Daily Routine</h3>
+      <ol>
+        <li><strong>Morning:</strong> Open Dashboard → check overnight wheel status and recent trades</li>
+        <li><strong>Review:</strong> Check any positions with DTE < 15 (yellow/red badges) — these are approaching roll territory</li>
+        <li><strong>Scan:</strong> Weekly, check the IV Scanner for new high-yield candidates</li>
+        <li><strong>Backtest:</strong> Before adding a new symbol, run a 1-year backtest to see historical wheel performance</li>
+        <li><strong>Adjust:</strong> If auto-execute is off, manually run a cycle when you see favorable conditions</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  NOTIFICATIONS                            -->
+  <!-- ════════════════════════════════════════ -->
+  <div class="section" id="notifications" style="scroll-margin-top:130px;">
+    <div class="section-header">
+      <span class="section-icon">🔔</span>
+      <span class="section-title" style="color:#e6c84d;">NOTIFICATIONS</span>
+    </div>
+
+    <div class="card">
+      <span class="card-label">Push Alerts</span>
+      <h3>Trade Event Notifications</h3>
+      <p>Wheel Mistro sends push notifications for key trade events (throttled to prevent spam — 6-hour cooldown per alert type):</p>
+      <table class="info-table">
+        <thead><tr><th>Event</th><th>What You're Told</th></tr></thead>
+        <tbody>
+          <tr><td class="label">Option Written (STO)</td><td>Symbol, contract details, premium per share received</td></tr>
+          <tr><td class="label">Roll Executed</td><td>Symbol, old → new strike, net credit/debit, roll reason</td></tr>
+          <tr><td class="label">Assignment</td><td>Symbol, shares acquired, strike price, "now selling calls"</td></tr>
+          <tr><td class="label">Called Away</td><td>Symbol, shares sold, strike price, cycle P&L</td></tr>
+          <tr><td class="label">Expired Worthless</td><td>Symbol, contract details, premium kept</td></tr>
+          <tr><td class="label">Roll Approaching</td><td>Symbol, reason (P&L % or DTE), time until trigger</td></tr>
+          <tr><td class="label">Cycle Complete</td><td>Positions checked, trades executed, premium earned today</td></tr>
+        </tbody>
+      </table>
+      <div class="tip">
+        <strong>Critical events</strong> (assignment, called away) are never throttled — you always get notified immediately when shares change hands.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding:40px 0 20px; border-top:1px solid rgba(185,154,51,0.1); margin-top:40px;">
+    <div style="font-family:'Orbitron',sans-serif; font-weight:700; font-size:0.9rem; letter-spacing:0.1em; background:linear-gradient(135deg,#b39a33,#e6c84d,#b39a33); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px;">WHEEL MISTRO</div>
+    <p style="font-size:0.75rem; color:#3d4260;">Automated Wheel Strategy Engine</p>
+    <p style="font-size:0.7rem; color:#2a2e42; margin-top:8px;">Part of the Signal Forge ecosystem</p>
+    <a href="https://wa.me/16784477884" target="_blank" rel="noopener" style="display:inline-block; margin-top:16px; padding:8px 20px; border-radius:20px; background:rgba(37,211,102,0.15); border:1px solid rgba(37,211,102,0.3); color:#25d366; font-size:0.8rem; font-weight:600; text-decoration:none; transition:background 0.3s;">
+      For More Info — WhatsApp Us
+    </a>
+  </div>
+
+</div>
+
+<script>
+  // Active nav on scroll
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  function updateActiveNav() {
+    let current = '';
+    const scrollTop = window.scrollY + 150;
+    sections.forEach(section => {
+      if (section.offsetTop <= scrollTop) {
+        current = section.getAttribute('id');
+      }
+    });
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-tab') === current) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav);
+  window.addEventListener('load', updateActiveNav);
+
+  // Scroll progress
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('scrollProgress').style.width = scrolled + '%';
+  });
+</script>
+
+</body>
+</html>
