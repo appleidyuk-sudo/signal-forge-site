@@ -529,8 +529,96 @@
     <div class="card">
       <span class="card-label">Channel Bar</span>
       <h3>Trading Channels</h3>
-      <p>A horizontally scrollable row of channel filter buttons. Each channel represents a trading style or strategy focus. Tap a channel to filter your portfolio signals through that lens.</p>
-      <p style="margin-top:10px;">Channels include categories like Momentum, Swing, Value, and more. The active channel is highlighted with a blue tint. Tap it again to deselect and return to the default "All" view.</p>
+      <p>The Channel Bar is a horizontally scrollable row of strategy chips that sits just below the title on the Home screen. Scroll left or right to reveal all five built-in channels — <strong>Momentum</strong>, <strong>Income</strong>, <strong>Mean Reversion</strong>, <strong>Trend</strong>, and <strong>Balanced</strong> — plus a sixth slot for your own saved <strong>My Setup</strong> configuration. Each chip shows the channel name and a one-line description of its trading style.</p>
+
+      <p style="margin-top:10px;">Tapping a channel instantly reconfigures the entire app to match that trading style. It is not a filter — it is a full configuration bundle. It sets which of the 12 toggleable indicators are active, overrides the Convergence Score weights to emphasize what matters for that style, and pre-selects a default screener preset in the Research tab. Every stock's Convergence Score recalculates immediately using the new weights, so the Signal Suggestion and watchlist rankings reflect the new trading lens within seconds of tapping.</p>
+
+      <p style="margin-top:10px;"><strong>What changes when you tap a channel vs. no channel (Manual mode):</strong></p>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#f5a623;">&#9889;</span> Momentum — Swing &amp; Breakout Trading</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Best for capturing stocks in motion — breakouts, volume surges, and short-to-medium-term swings of 3–15 days. Focuses on rate-of-change, trend strength, and confirming volume.</p>
+        <div class="formula">
+          Active indicators: MACD, ROC, ADX, Supertrend, OBV, MFI<br>
+          Convergence weights: Signal 25% &nbsp;| Trend 30% &nbsp;| Momentum 30% &nbsp;| Risk 5% &nbsp;| Sentiment 10%<br>
+          Default screener: Volume Breakouts
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f5a623;font-weight:700;">›</span> Trend and momentum together account for 60% of the Convergence Score. Signal (BB/RSI) counts for only 25%, risk for just 5%.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f5a623;font-weight:700;">›</span> ADX and Supertrend confirm directional strength before a breakout is scored. OBV and MFI confirm volume and money-flow are behind the move.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f5a623;font-weight:700;">›</span> Use this channel when you want the app to surface stocks with strong, confirmed directional moves rather than mean-reversion setups.</li>
+        </ul>
+      </div>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#4cd964;">&#36;</span> Income — Premium Selling &amp; Theta Decay</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Designed for options sellers — covered calls, cash-secured puts, iron condors. Prioritizes stocks with elevated implied volatility, earnings clearance, and range-bound behavior.</p>
+        <div class="formula">
+          Active indicators: ATR, VWAP, MFI, Stochastic, Williams %R<br>
+          Convergence weights: Signal 25% &nbsp;| Trend 15% &nbsp;| Momentum 15% &nbsp;| Risk 20% &nbsp;| Sentiment 25%<br>
+          Default screener: BB Squeeze Setups
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4cd964;font-weight:700;">›</span> Risk (ATR-based) and Sentiment (earnings proximity, MFI) account for 45% of the score — the largest combined weight of any channel.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4cd964;font-weight:700;">›</span> Trend weight drops to 15% because income strategies do not require a strong trend — they often work best in neutral or slightly trending markets.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4cd964;font-weight:700;">›</span> ATR measures the daily range available for premium collection. VWAP anchors fair value. Stochastic and %R identify the range extremes where selling premium has the highest probability.</li>
+        </ul>
+      </div>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#9b59b6;">&#8635;</span> Mean Reversion — Oversold Bounces &amp; Overbought Fades</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">For counter-trend traders hunting rubber-band snaps — stocks that have stretched too far from fair value and are due to snap back. Highest signal weight of any channel.</p>
+        <div class="formula">
+          Active indicators: Stochastic, ATR, Williams %R, MFI, Keltner Channels, ROC<br>
+          Convergence weights: Signal 40% &nbsp;| Trend 10% &nbsp;| Momentum 20% &nbsp;| Risk 15% &nbsp;| Sentiment 15%<br>
+          Default screener: Oversold Bounces
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#9b59b6;font-weight:700;">›</span> Signal weight is 40% — double the Trend channel — because BB/RSI extremes are the primary trigger for mean-reversion entries.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#9b59b6;font-weight:700;">›</span> Keltner Channels identify whether price has pierced ATR-based extremes. Williams %R and Stochastic confirm oversold/overbought readings across different lookbacks.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#9b59b6;font-weight:700;">›</span> Trend weight is only 10% — mean reversion trades specifically look for weak or counter-trend momentum as confirmation the move is exhausted.</li>
+        </ul>
+      </div>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#4a90d9;">&#8599;</span> Trend — Ride the Trend with Confirmation</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">For position traders and swing traders who follow established trends. Requires strong confirmation from multiple trend-following indicators before scoring a stock highly.</p>
+        <div class="formula">
+          Active indicators: ADX, Supertrend, Aroon, MACD, OBV, VWAP<br>
+          Convergence weights: Signal 20% &nbsp;| Trend 40% &nbsp;| Momentum 20% &nbsp;| Risk 10% &nbsp;| Sentiment 10%<br>
+          Default screener: SMA Breakouts
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span> Trend weight is 40% — the highest single-category weight across all channels. A stock needs strong ADX, bullish Aroon, and Supertrend aligned to score well.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span> MACD and OBV add momentum and volume confirmation. VWAP keeps the score anchored to institutional participation.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span> Signal weight drops to 20% — a BB squeeze or RSI oversold reading matters less when you are riding a strong trend that may stay extended for weeks.</li>
+        </ul>
+      </div>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#e0e0e0;">&#9878;</span> Balanced — All Indicators, Default Weights</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">The full picture. All 12 toggleable indicators active, Convergence Score weights at their factory defaults. No bias toward any trading style — best for general portfolio monitoring or when you are not in a specific mode.</p>
+        <div class="formula">
+          Active indicators: All 12 (MACD, Stoch, ATR, VWAP, ADX, Supertrend, Keltner, MFI, OBV, ROC, Aroon, %R)<br>
+          Convergence weights: Signal 35% &nbsp;| Trend 25% &nbsp;| Momentum 20% &nbsp;| Risk 10% &nbsp;| Sentiment 10%<br>
+          Default screener: none
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#e0e0e0;font-weight:700;">›</span> Balanced is the widest lens — it will not filter any signals out, so you see every opportunity the system detects regardless of style.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#e0e0e0;font-weight:700;">›</span> Because all indicators are on, chart overlays and the watchlist show the full set of technical overlays. Use this when reviewing a position you already hold and want maximum data context.</li>
+        </ul>
+      </div>
+
+      <div class="subsection" style="margin-top:12px;">
+        <div class="subsection-title"><span class="icon" style="color:#f0c040;">&#9733;</span> Manual Mode (No Channel Selected)</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">When no channel chip is highlighted, the app is in Manual mode. Your individually toggled indicators and hand-adjusted Convergence Score weights are in full control. Nothing resets automatically.</p>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f0c040;font-weight:700;">›</span> <strong>Tapping a channel always overwrites your current indicator set and weights.</strong> If you have spent time tuning settings manually, save them first as "My Setup" via Settings before tapping a channel — otherwise they will be replaced.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f0c040;font-weight:700;">›</span> Clearing a channel (Settings → Clear Channel) returns to Manual mode but does not reset indicators or weights — whatever the channel set stays active until you change it manually.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f0c040;font-weight:700;">›</span> After tapping a channel you can still manually toggle individual indicators off without switching channels. The active channel chip remains highlighted as a "last applied" label — it does not enforce a lock on your settings.</li>
+          <li style="padding:4px 0 4px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#f0c040;font-weight:700;">›</span> <strong>My Setup</strong> — save your current indicator selection and weight configuration as a named custom channel. It appears as a chip in the bar and can be reapplied in one tap after any channel switch.</li>
+        </ul>
+      </div>
 
       <div class="screenshot" id="ss-home-channels">
         <div class="camera">📷</div>
