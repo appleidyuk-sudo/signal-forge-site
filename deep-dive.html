@@ -994,18 +994,104 @@
     <div class="card">
       <span class="card-label">Charts</span>
       <h3>Expanded Chart View</h3>
-      <p>Tap the chart in the Technicals tab to enter full-screen immersive mode. The expanded chart fills the screen with 6 months of daily candlestick data and these overlays:</p>
-      <table class="info-table">
-        <thead><tr><th>Overlay</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td class="label">Bollinger Bands</td><td>Upper/lower bands (2 standard deviations) with 20-day SMA midline</td></tr>
-          <tr><td class="label">EMA 12 / EMA 26</td><td>Fast and slow exponential moving averages — crossovers highlight trend changes</td></tr>
-          <tr><td class="label">Volume Bars</td><td>Daily volume colored green (up day) or red (down day)</td></tr>
-          <tr><td class="label">Signal Markers</td><td>Buy/sell dots at the exact points where signals triggered</td></tr>
-          <tr><td class="label">SuperTrend</td><td>ATR-based trend line that flips between uptrend and downtrend</td></tr>
-          <tr><td class="label">Keltner Channels</td><td>ATR-based channels — when Bollinger Bands contract inside Keltner, it signals a "squeeze" (breakout imminent)</td></tr>
-        </tbody>
-      </table>
+      <p>Tap the chart in the Technicals tab to enter full-screen immersive mode. The expanded chart fills the screen with 6 months of daily candlestick data and six overlays — each explained in detail below.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📊</span> Bollinger Bands</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Three lines plotted around price: a 20-day Simple Moving Average (middle band) with upper and lower bands at ±2 standard deviations. The bands dynamically widen in high volatility and contract in low volatility periods.</p>
+        <div class="formula">
+          Middle Band = SMA(20)<br>
+          Upper Band &nbsp;= SMA(20) + (2 × σ₂₀)<br>
+          Lower Band &nbsp;= SMA(20) − (2 × σ₂₀)<br>
+          <span class="cmt">// σ₂₀ = standard deviation of close prices over 20 days</span><br>
+          %B = (Price − Lower Band) / (Upper Band − Lower Band)<br>
+          <span class="cmt">// %B: 0 = at lower band, 1 = at upper band, 0.5 = midline</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Price touches upper band</strong> — overbought zone; ~5% of closes exceed this level statistically. Could signal reversal or momentum continuation.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Price touches lower band</strong> — oversold zone; potential bounce or continued breakdown if selling pressure persists.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Bands narrowing (squeeze)</strong> — volatility is compressing; a large directional move is building. The narrower the bands, the bigger the expected breakout.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Bands expanding rapidly</strong> — volatility explosion in progress; the trend is real and accelerating.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Walking the band</strong> — in strong trends, price "walks" along the upper (uptrend) or lower (downtrend) band for extended periods without reversing.</li>
+        </ul>
+        <div class="tip green"><strong>Signal logic:</strong> SignalForge fires a BUY when price closes near the lower band AND RSI is below 35. A SELL fires when price closes near the upper band AND RSI is above 65. Both conditions must align.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📈</span> EMA 12 / EMA 26</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Two exponential moving averages — EMA weights recent prices more heavily than a simple average, making it faster to react to price changes. EMA-12 is the "fast" line; EMA-26 is the "slow" line.</p>
+        <div class="formula">
+          EMA(today) = Price(today) × k + EMA(yesterday) × (1 − k)<br>
+          <span class="cmt">// k (smoothing factor) = 2 ÷ (period + 1)</span><br>
+          EMA-12: k = 0.1538 &nbsp;&nbsp; EMA-26: k = 0.0741<br><br>
+          MACD Line = EMA-12 − EMA-26<br>
+          <span class="cmt">// Positive MACD = short-term momentum is above long-term (bullish)</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>EMA-12 crosses above EMA-26</strong> — bullish crossover; short-term momentum exceeding long-term. Often called a "Golden Cross" in the short-period context.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>EMA-12 crosses below EMA-26</strong> — bearish crossover; downtrend accelerating. "Death Cross" equivalent.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Price above both EMAs</strong> — bullish trend intact; EMAs act as dynamic support levels. Dips to the EMA lines are buy opportunities in uptrends.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Price below both EMAs</strong> — bearish trend; EMAs act as overhead resistance.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Spread between EMAs</strong> — the wider the gap between EMA-12 and EMA-26, the stronger the trend momentum. A converging spread signals trend exhaustion.</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🔴</span> SuperTrend</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">An ATR-based trailing stop line that rides below price in an uptrend (green) and above price in a downtrend (red). It flips sides when price closes through it — creating clean buy and sell signals.</p>
+        <div class="formula">
+          ATR(10) = Average True Range over 10 periods<br>
+          <span class="cmt">// True Range = max(High−Low, |High−PrevClose|, |Low−PrevClose|)</span><br><br>
+          Basic Upper = (High + Low) / 2 + (3 × ATR)<br>
+          Basic Lower = (High + Low) / 2 − (3 × ATR)<br><br>
+          SuperTrend = Basic Lower (bullish) or Basic Upper (bearish)<br>
+          <span class="cmt">// Multiplier of 3 × ATR is the default — wider = fewer signals, less noise</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Green line below price</strong> — uptrend confirmed; line is a rising trailing stop that locks in gains as the stock climbs.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Red line above price</strong> — downtrend confirmed; price is capped by a falling resistance ceiling.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Flip from red → green</strong> — buy signal; price closed above the descending resistance line. Often marks the start of a sustained rally.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Flip from green → red</strong> — sell signal; price closed below the ascending support line. Consider exiting or hedging.</li>
+        </ul>
+        <div class="tip"><strong>Best conditions:</strong> SuperTrend performs well in trending markets. In choppy, sideways markets it can whipsaw repeatedly — always confirm with Bollinger Band signals or RSI before acting on a flip alone.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🌊</span> Keltner Channels</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">ATR-based envelope channels centered on an EMA. Unlike Bollinger Bands (which use standard deviation), Keltner uses Average True Range — making them less reactive to volatility spikes. The key relationship is between Bollinger Bands and Keltner Channels together.</p>
+        <div class="formula">
+          Middle Line &nbsp;= EMA(20)<br>
+          Upper Channel = EMA(20) + (1.5 × ATR(10))<br>
+          Lower Channel = EMA(20) − (1.5 × ATR(10))<br><br>
+          <span class="cmt">// Squeeze condition (Bollinger Band Squeeze):</span><br>
+          <span class="grn">BB Upper &lt; KC Upper  AND  BB Lower &gt; KC Lower</span><br>
+          <span class="cmt">// = Bollinger Bands are entirely inside the Keltner Channels</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>BB inside KC (squeeze active)</strong> — volatility has compressed below "normal" ATR levels. The market is coiling. Watch for the direction of the first breakout bar.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>BB expands outside KC (squeeze fired)</strong> — volatility has been released. The move is real. Trade the direction of the breakout with a tight stop.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Price at outer Keltner lines</strong> — extreme move relative to recent ATR. Often mean-reverts; watch for exhaustion candles (doji, hammer, shooting star).</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span>Long squeeze setups often lead to 5–15% moves once fired. The longer the squeeze, the larger the explosion tends to be.</li>
+        </ul>
+        <div class="tip green"><strong>Explorer filter:</strong> The "BB Squeeze" preset in Research → Explorer automatically scans for stocks where this condition is active right now.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📊</span> Volume Bars</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Daily trading volume displayed as a histogram below the price chart. Green bars = up days (price closed above open). Red bars = down days. Volume is the "conviction meter" — it validates or questions every price move.</p>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>High volume on breakout (green bar)</strong> — institutional buyers are committed; the move is real. High probability of continuation.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Low volume on breakout</strong> — suspect move; retail-driven or short-squeeze. May fail and retrace (bull trap risk).</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Declining volume during downtrend</strong> — selling pressure weakening; exhaustion approaching. Potential reversal setup.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Massive red spike (capitulation)</strong> — panic selling at max fear. Often marks a price bottom as sellers are exhausted. Look for a reversal candle the following session.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Steady rising volume in uptrend</strong> — accumulation; institutional buyers are building positions. The rally has legs.</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📍</span> Signal Markers</div>
+        <p style="font-size:0.85rem; color:#9aa0b8;">Colored dots plotted directly on the candlestick chart at the exact price and date when SignalForge generated a signal. Green dots = BUY signal triggered. Red dots = SELL signal triggered. Use these to visually back-test how well signals have timed the stock's moves historically.</p>
+      </div>
 
       <div class="screenshot" id="ss-research-chart">
         <div class="camera">📷</div>
@@ -1052,6 +1138,195 @@
       <div class="screenshot" id="ss-research-ivhv">
         <div class="camera">📷</div>
         <div class="caption">Screenshot: IV/HV chart with probability distribution</div>
+      </div>
+    </div>
+
+    <!-- Greeks Deep Dive -->
+    <div class="card">
+      <span class="card-label">Option Greeks — Full Reference</span>
+      <h3>Greeks Explained</h3>
+      <p>Greeks measure how sensitive an option's price is to various market factors. SignalForge plots all four first-order Greeks across every available strike in the butterfly charts, so you can see the complete risk landscape for any expiration at a glance.</p>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">Δ</span> Delta — Price Sensitivity</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">How much an option's price moves for every $1 move in the underlying stock. Delta is the most important Greek for understanding directional exposure.</p>
+        <div class="formula">
+          Range: <span class="grn">0 to +1.0</span> for calls &nbsp;|&nbsp; <span class="kw">−1.0 to 0</span> for puts<br>
+          Delta 0.50 → option gains/loses $0.50 per $1 stock move<br>
+          <span class="cmt">// Delta also ≈ probability the option expires in-the-money (ITM)</span><br>
+          <span class="cmt">// Delta 0.30 ≈ 30% chance of expiring ITM</span>
+        </div>
+        <table class="info-table" style="margin-top:10px;">
+          <thead><tr><th>Delta</th><th>Moneyness</th><th>What It Means</th></tr></thead>
+          <tbody>
+            <tr><td class="label buy">0.75 – 1.00</td><td>Deep ITM Call</td><td>Moves almost like owning 75–100 shares. High intrinsic value, low time premium. Acts like stock.</td></tr>
+            <tr><td class="label hold">0.45 – 0.55</td><td>ATM Call</td><td>At-the-money — most sensitive to price changes. 50/50 ITM probability. Highest gamma and theta.</td></tr>
+            <tr><td class="label">0.10 – 0.30</td><td>OTM Call</td><td>Cheap, speculative. Low probability. Best for defined-risk directional bets with small capital.</td></tr>
+            <tr><td class="label sell">−0.20 to −0.30</td><td>OTM Put (CSP)</td><td>The income-selling sweet spot. ~70–80% probability of expiring worthless. Strong premium with manageable assignment risk.</td></tr>
+          </tbody>
+        </table>
+        <div class="tip green"><strong>Covered Call targeting:</strong> Sell the 0.25–0.35 delta call to balance income collection vs. probability of having shares called away. Higher delta = more premium, higher assignment risk.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">Γ</span> Gamma — Delta's Rate of Change</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">How quickly delta changes as the stock moves $1. Gamma is the "acceleration" of your position. It is always positive for option buyers (helps you) and always negative for option sellers (hurts you).</p>
+        <div class="formula">
+          If Delta = 0.50 and Gamma = 0.05:<br>
+          &nbsp;&nbsp;Stock +$1 → new Delta = 0.55 (position getting longer)<br>
+          &nbsp;&nbsp;Stock −$1 → new Delta = 0.45 (position getting shorter)<br><br>
+          <span class="cmt">// Gamma is HIGHEST for ATM options near expiration</span><br>
+          <span class="cmt">// Gamma is LOWEST for far OTM/ITM options or long DTE</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>High gamma (ATM, &lt;7 DTE)</strong> — small moves in the stock cause large swings in option value. A 1% stock move might move the option 20–30%.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Low gamma (deep ITM/OTM, long DTE)</strong> — delta changes slowly; more predictable and manageable exposure.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Gamma squeeze risk (sellers)</strong> — if a short option moves ATM near expiry, gamma accelerates losses exponentially with every tick against you.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Gamma scalping (buyers)</strong> — long gamma positions profit from big moves in either direction. The stock just has to move enough to offset theta decay.</li>
+        </ul>
+        <div class="tip yellow"><strong>Seller's rule:</strong> Never hold a short ATM option through expiration week. Gamma spikes dramatically in the final 5 trading days — a 2% stock move can wipe out the entire premium collected.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">Θ</span> Theta — Time Decay</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">How much value an option loses each calendar day from the passage of time alone, with the stock price and IV unchanged. Theta is always negative for option buyers and always positive for sellers.</p>
+        <div class="formula">
+          Theta = −$0.05 per day per share<br>
+          → 1 contract (100 shares) loses $5.00 per day<br>
+          → 30 DTE option loses $150 over its remaining life (if linear)<br><br>
+          <span class="cmt">// Theta decay is NOT linear — it accelerates as expiry approaches</span><br>
+          <span class="cmt">// Roughly: ~50% of an option's time value decays in the final 30 days</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>For sellers (CSP, Covered Call)</strong> — theta works for you every single day. Even on flat days with no price movement, you're profiting from time decay.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>For buyers (Long Call, Long Put)</strong> — the clock is always ticking against you. Your position must move fast enough to overcome daily theta bleed.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>30–45 DTE sweet spot</strong> — the standard income-selling target range. Enough premium to be worthwhile, but theta decay is accelerating. Exit at 50% profit to capture most of the decay without holding through gamma risk.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Weekend effect</strong> — theta accounts for 3 days over weekends (Fri/Sat/Sun) but options only trade 5 days a week. Selling on Friday captures 3 days of decay by Monday open.</li>
+        </ul>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">V</span> Vega — Implied Volatility Sensitivity</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">How much an option's price changes for every 1 percentage point move in Implied Volatility (IV). Vega is always positive for both calls and puts — higher IV always makes options more expensive, regardless of direction.</p>
+        <div class="formula">
+          Vega = $0.12 → option gains $0.12 per 1% rise in IV<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;option loses $0.12 per 1% drop in IV<br><br>
+          <span class="cmt">// Vega is HIGHEST for ATM options with lots of time remaining</span><br>
+          <span class="cmt">// Vega FALLS as expiration approaches (time = vega's fuel)</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>IV crush after earnings</strong> — IV spikes before earnings (uncertainty premium), then collapses 30–50% after the announcement regardless of the move. Option buyers can be correct on direction and still lose money due to vega collapse.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>High IV environment</strong> — options are "expensive" relative to realized moves. Favor selling strategies (CSP, Covered Call, Iron Condor) to collect rich premium.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Low IV environment</strong> — options are "cheap." Favor buying strategies (Long Call, Long Put) since you own vega and benefit when IV eventually expands.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>IV vs HV check</strong> — use the IV/HV chart in SignalForge. If IV is significantly above Historical Volatility (HV), options are overpriced. If IV is below HV, they're underpriced.</li>
+        </ul>
+        <div class="tip"><strong>IV Rank (IVR) rule of thumb:</strong> IVR &gt; 50 = options expensive, prefer selling. IVR &lt; 30 = options cheap, prefer buying. IVR is IV's percentile rank over the past 52 weeks.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📐</span> Key Option Metrics Reference</div>
+        <table class="info-table">
+          <thead><tr><th>Metric</th><th>Definition</th><th>How to Use It</th></tr></thead>
+          <tbody>
+            <tr><td class="label">Expected Move (EM)</td><td>≈ ATM straddle price. More precisely: Stock × IV × √(DTE/365)</td><td>±1σ range the market implies by expiration. ~68% probability price stays within this range. Overlaid on probability distribution chart.</td></tr>
+            <tr><td class="label">Max Pain</td><td>The strike where aggregate option losses (puts + calls combined) are maximized at expiration</td><td>Market makers are incentivized to keep price near this level. Watch the final week before expiry — price often gravitates toward max pain as hedges unwind.</td></tr>
+            <tr><td class="label">Open Interest (OI)</td><td>Total number of outstanding contracts at each strike (not closed or expired)</td><td>Large OI = significant player interest. High OI strikes act as price magnets or walls. A stock approaching a 50,000 OI call wall often stalls there.</td></tr>
+            <tr><td class="label">Implied Volatility (IV)</td><td>The market's consensus forecast of future volatility, backed out of current option prices via Black-Scholes</td><td>Compare to Historical Volatility. Rising IV = market expects bigger moves. Use IV/HV chart to judge whether to buy or sell volatility.</td></tr>
+            <tr><td class="label">ROC % (OptionFlow)</td><td>Premium received ÷ Capital at risk × 100<br><small>CSP: premium ÷ (strike × 100) | Cov Call: premium ÷ cost basis</small></td><td>Target 1–3% ROC per month for income strategies. Annualized: multiply monthly ROC × 12. Higher ROC usually means more risk (closer strike, more assignment probability).</td></tr>
+            <tr><td class="label">DTE</td><td>Calendar days until expiration (not trading days)</td><td>🔴 ≤7 DTE = gamma danger zone. 🟡 ≤21 DTE = consider rolling. ✅ 30–45 DTE = income-selling sweet spot. &gt;60 DTE = low theta, for buyers only.</td></tr>
+            <tr><td class="label">Intrinsic Value</td><td>Calls: max(Stock − Strike, 0) | Puts: max(Strike − Stock, 0)</td><td>The guaranteed value if exercised immediately. Deep ITM options are mostly intrinsic. OTM options have zero intrinsic — all time premium (extrinsic) value.</td></tr>
+            <tr><td class="label">Extrinsic Value</td><td>Option Price − Intrinsic Value</td><td>The "hope premium" — what you pay for time and volatility. All extrinsic value decays to zero at expiration. Option sellers profit from collecting and holding extrinsic value.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Technical Indicators Reference -->
+    <div class="card">
+      <span class="card-label">Technical Indicators Reference</span>
+      <h3>RSI, Momentum Score & Convergence</h3>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">💪</span> RSI — Relative Strength Index</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Measures the speed and magnitude of recent price changes to identify overbought and oversold conditions. RSI oscillates between 0 and 100.</p>
+        <div class="formula">
+          RSI = 100 − [100 / (1 + RS)]<br>
+          RS = Average Gain (14 periods) / Average Loss (14 periods)<br><br>
+          <span class="cmt">// Period: 14 days (default). SignalForge uses 14-period daily RSI.</span><br>
+          <span class="cmt">// Gains and losses are averaged using Wilder's smoothing method</span>
+        </div>
+        <table class="info-table" style="margin-top:10px;">
+          <thead><tr><th>RSI Level</th><th>Zone</th><th>Interpretation</th></tr></thead>
+          <tbody>
+            <tr><td class="label sell">70 – 100</td><td class="sell">Overbought</td><td>Stock has risen rapidly relative to recent history. Not a sell signal alone — in strong uptrends, RSI can stay overbought for weeks. Look for RSI divergence (price makes new high, RSI doesn't) as a warning.</td></tr>
+            <tr><td class="label hold">40 – 60</td><td class="hold">Neutral</td><td>No strong momentum bias. Price is consolidating or in a sideways range. Watch for a breakout in either direction.</td></tr>
+            <tr><td class="label buy">0 – 30</td><td class="buy">Oversold</td><td>Stock has fallen sharply. Potential reversal zone. Strongest buy signals occur when price touches the lower Bollinger Band AND RSI is below 30–35 simultaneously.</td></tr>
+          </tbody>
+        </table>
+        <div class="tip green"><strong>Divergence signals:</strong> Bullish divergence = price makes a new low but RSI makes a higher low (seller exhaustion). Bearish divergence = price makes a new high but RSI makes a lower high (buyer exhaustion). Both are strong reversal warnings.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🚀</span> Momentum Score</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">A composite 0–100 ranking of price momentum across multiple timeframes, normalized across all stocks in your watchlist so you can compare relative strength at a glance.</p>
+        <div class="formula">
+          Momentum inputs:<br>
+          &nbsp;&nbsp;• Rate of Change (ROC) — 5, 10, 20 day price changes<br>
+          &nbsp;&nbsp;• EMA alignment — price position relative to EMA-12/26<br>
+          &nbsp;&nbsp;• Volume trend — rising vs declining volume confirmation<br>
+          <span class="cmt">// Combined and normalized 0–100 across all watchlist stocks</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>80–100</strong> — strongest momentum in your portfolio; trend is intact and accelerating</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>50–80</strong> — moderate momentum; trend is present but not extreme</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>20–50</strong> — weak or mixed momentum; stock may be consolidating or reversing</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>0–20</strong> — weakest in the portfolio; strong downtrend. High caution for longs.</li>
+        </ul>
+        <div class="tip"><strong>Bubble Chart use:</strong> Stocks in the upper-right quadrant of the Bubble Chart have both high momentum AND strong signals — your highest-conviction opportunities. Lower-left = weakest.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">🎯</span> Convergence Score</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">The core SignalForge metric. Measures how many independent technical indicators all agree on the same directional view. Higher convergence = higher signal confidence.</p>
+        <div class="formula">
+          Indicators checked:<br>
+          &nbsp;&nbsp;• Bollinger Band position (%B and bandwidth)<br>
+          &nbsp;&nbsp;• RSI (overbought / oversold level)<br>
+          &nbsp;&nbsp;• EMA-12/26 crossover direction<br>
+          &nbsp;&nbsp;• SuperTrend flip direction<br>
+          &nbsp;&nbsp;• Volume trend confirmation<br>
+          &nbsp;&nbsp;• Keltner squeeze status<br>
+          &nbsp;&nbsp;• MACD signal line crossover<br><br>
+          Score 0–100. BUY fires at ≥65 (default). SELL fires at ≤35.<br>
+          <span class="cmt">// Tune these thresholds in Settings → Signal Thresholds</span>
+        </div>
+        <table class="info-table" style="margin-top:10px;">
+          <thead><tr><th>Score Range</th><th>Signal</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="label buy">65 – 100</td><td class="buy">BUY</td><td>Majority of indicators agree: bullish. The higher the score, the stronger the conviction. 85+ = very high confidence setup.</td></tr>
+            <tr><td class="label hold">36 – 64</td><td class="hold">HOLD</td><td>Mixed signals. Indicators don't agree — staying neutral is prudent. Wait for a clearer setup.</td></tr>
+            <tr><td class="label sell">0 – 35</td><td class="sell">SELL</td><td>Majority of indicators agree: bearish. Score near 0 = extremely weak, multiple confirming sell signals.</td></tr>
+          </tbody>
+        </table>
+        <div class="tip green"><strong>Tap "Criteria"</strong> on the Top Pick card to see the exact breakdown — which specific indicators are firing and contributing to the score for that stock right now.</div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title"><span class="icon">📏</span> ATR — Average True Range</div>
+        <p style="font-size:0.85rem; color:#9aa0b8; margin-bottom:8px;">Measures the average daily price range, accounting for overnight gaps. ATR is not directional — it only measures volatility (how much the stock moves, not which way).</p>
+        <div class="formula">
+          True Range = max of:<br>
+          &nbsp;&nbsp;• High − Low (intraday range)<br>
+          &nbsp;&nbsp;• |High − Previous Close| (gap up)<br>
+          &nbsp;&nbsp;• |Low − Previous Close| (gap down)<br><br>
+          ATR(14) = Wilder's smoothed average of True Range over 14 days<br>
+          <span class="cmt">// Used internally by SuperTrend and Keltner Channel calculations</span>
+        </div>
+        <ul style="list-style:none; padding:0; margin-top:8px;">
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Stop loss sizing:</strong> Place stops 1.5–2× ATR below entry to avoid being stopped out by normal daily noise.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>Position sizing:</strong> Risk the same dollar amount per trade — allocate fewer shares in high-ATR stocks and more in low-ATR stocks.</li>
+          <li style="padding:5px 0 5px 20px; position:relative; font-size:0.85rem; color:#9aa0b8;"><span style="position:absolute;left:4px;color:#4a90d9;font-weight:700;">›</span><strong>ATR expansion</strong> — rising ATR means volatility is increasing; breakouts on expanding ATR are more reliable.</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -1115,19 +1390,20 @@
     <div class="card">
       <span class="card-label">Analytics</span>
       <h3>Performance Stats Dashboard</h3>
-      <p>Collapsible section showing detailed trading statistics:</p>
+      <p>Collapsible section showing detailed trading statistics. These metrics tell you not just whether you're profitable, but whether your system has edge and how efficiently it uses risk.</p>
       <table class="info-table">
-        <thead><tr><th>Metric</th><th>What It Tells You</th></tr></thead>
+        <thead><tr><th>Metric</th><th>Formula</th><th>What It Tells You</th></tr></thead>
         <tbody>
-          <tr><td class="label">Win Rate %</td><td>Percentage of closed trades that ended in profit</td></tr>
-          <tr><td class="label">Avg Winner</td><td>Average profit on winning trades</td></tr>
-          <tr><td class="label">Avg Loser</td><td>Average loss on losing trades</td></tr>
-          <tr><td class="label">Profit Factor</td><td>Gross profits / gross losses. Above 1.0 = profitable system. Above 2.0 = strong.</td></tr>
-          <tr><td class="label">Max Drawdown</td><td>Largest peak-to-trough decline — measures worst-case scenario</td></tr>
-          <tr><td class="label">Sharpe Ratio</td><td>Risk-adjusted return. Above 1.0 = good, above 2.0 = excellent.</td></tr>
-          <tr><td class="label">Total / Closed Trades</td><td>Count of all trades and completed trades</td></tr>
+          <tr><td class="label">Win Rate %</td><td>Winning trades ÷ Total closed trades × 100</td><td>Percentage of closed trades that ended in profit. A 50% win rate is not inherently bad — what matters is the <em>ratio</em> of average winner to average loser (see Profit Factor). A system with 40% win rate and 3:1 reward/risk is extremely profitable.</td></tr>
+          <tr><td class="label">Avg Winner</td><td>Sum of profits ÷ Number of winning trades</td><td>Average dollar or % gain on trades that closed profitably. Compare to Avg Loser. You want this to be significantly larger than your average loss.</td></tr>
+          <tr><td class="label">Avg Loser</td><td>Sum of losses ÷ Number of losing trades</td><td>Average dollar or % loss on trades that closed at a loss. If Avg Loser &gt; Avg Winner, you need a very high win rate to be net profitable — a sign of a poorly sized stop strategy.</td></tr>
+          <tr><td class="label">Profit Factor</td><td>Gross profits ÷ Gross losses</td><td>The single best measure of a trading system's edge. <span class="buy">&gt;2.0</span> = strong edge. <span class="hold">1.25–2.0</span> = viable, worth refining. <span class="sell">&lt;1.0</span> = losing system. A Profit Factor of 1.5 means for every $1 lost, you make $1.50 — you keep $0.50 of net profit per dollar risked.</td></tr>
+          <tr><td class="label">Max Drawdown</td><td>Largest peak-to-trough equity decline during the period</td><td>Your worst-case loss scenario — how much your simulated account dropped from its high before recovering. If Max Drawdown is larger than you could emotionally tolerate in a real account, reduce position sizing. Target: keep drawdown under 20% of account.</td></tr>
+          <tr><td class="label">Sharpe Ratio</td><td>(Portfolio Return − Risk-Free Rate) ÷ Std Dev of Returns</td><td>Risk-adjusted return. Measures how much return you earn per unit of volatility. <span class="buy">&gt;2.0</span> = excellent. <span class="hold">1.0–2.0</span> = good. <span class="sell">&lt;1.0</span> = too much risk for the return. A Sharpe of 1.5 means you're earning 1.5 units of return for every unit of risk taken.</td></tr>
+          <tr><td class="label">Total / Closed Trades</td><td>Count of all positions opened / count of exited positions</td><td>Total includes active open positions. Closed is your completed track record. More closed trades = more statistical significance — 20+ closed trades gives you a meaningful read on your system's true edge.</td></tr>
         </tbody>
       </table>
+      <div class="tip green"><strong>Interpreting your stats together:</strong> A great system has Win Rate × Avg Winner &gt; (1 − Win Rate) × Avg Loser, Profit Factor above 1.5, Max Drawdown under 15%, and Sharpe above 1.0. Use the ghost simulator to find that combination before risking real capital.</div>
     </div>
 
     <!-- Active Trades -->
