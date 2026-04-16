@@ -525,6 +525,22 @@
       </div>
     </div>
 
+    <!-- Major Indices Ribbon -->
+    <div class="card">
+      <span class="card-label">Market Pulse</span>
+      <h3>Major Indices Ribbon</h3>
+      <p>A compact three-column ribbon sitting directly above the Channel Bar shows the live state of the three bellwether U.S. indices so you can frame every decision against the broader tape:</p>
+      <ul>
+        <li><strong>S&amp;P 500</strong> (<code>^GSPC</code>) — The canonical large-cap benchmark</li>
+        <li><strong>Dow</strong> (<code>^DJI</code>) — 30 blue-chip industrial names</li>
+        <li><strong>NASDAQ</strong> (<code>^IXIC</code>) — Tech-heavy composite</li>
+      </ul>
+      <p style="margin-top:10px;">Each column shows the last price on top and the day's percent change below. Green means up, red means down. Values refresh every time you pull-to-refresh the Home screen or tap the reload button.</p>
+      <div class="tip">
+        <strong>Why it matters:</strong> A stock's signal rarely moves in isolation. If the S&amp;P is down 1.5% and your portfolio is flat, that's alpha. If your BUY signals are piling up while all three indices are red, it may be a broader risk-off day rather than a stock-specific setup.
+      </div>
+    </div>
+
     <!-- Channel Bar -->
     <div class="card">
       <span class="card-label">Channel Bar</span>
@@ -669,6 +685,30 @@
         <li><strong>Best Performer</strong> (green star icon) — The stock with the highest return. Tap to open its Deep Dive.</li>
         <li><strong>Worst Performer</strong> (red warning icon) — The stock with the worst return. Tap to review whether it's time to exit.</li>
       </ul>
+    </div>
+
+    <!-- Movers & Shakers -->
+    <div class="card">
+      <span class="card-label">Market Discovery</span>
+      <h3>Movers & Shakers</h3>
+      <p>A discovery card that surfaces the names moving the market right now — so you can find candidates outside your watchlist without leaving the Home screen. Seven predefined Yahoo Finance screeners are exposed as a horizontally scrollable chip row at the top of the card:</p>
+      <table class="info-table">
+        <thead><tr><th>Screener</th><th>What it surfaces</th></tr></thead>
+        <tbody>
+          <tr><td class="label"><strong>Most Active</strong></td><td>Highest dollar-volume names traded today — the day's liquidity leaders</td></tr>
+          <tr><td class="label buy"><strong>Gainers</strong></td><td>Largest regular-session percentage gains</td></tr>
+          <tr><td class="label sell"><strong>Losers</strong></td><td>Largest regular-session percentage declines</td></tr>
+          <tr><td class="label"><strong>Trending</strong></td><td>Tickers with the most user interest / search activity</td></tr>
+          <tr><td class="label" style="color:#4ade80;"><strong>Undervalued Growth</strong></td><td>Earnings growth &gt; 25% with relatively low P/E and PEG</td></tr>
+          <tr><td class="label" style="color:#fbbf24;"><strong>Small Caps</strong></td><td>Aggressive small-cap names with high growth characteristics</td></tr>
+          <tr><td class="label" style="color:#60a5fa;"><strong>Growth Tech</strong></td><td>Technology sector names with strongest growth profiles</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:10px;">Tap any chip to load the top ten names for that screener. Each row shows the symbol, company short name, last price, percent change (color-coded), and volume in compact form (e.g., <code>42.3M</code>). Results cache for five minutes so chip switching is instant.</p>
+      <p style="margin-top:10px;"><strong>Tap a row to open a full Deep Dive</strong> — complete chart, indicators, pattern recognition, news, earnings, and a Save button in the toolbar that adds the symbol to your watchlist so you can track it alongside your portfolio.</p>
+      <div class="tip green">
+        <strong>Power tip:</strong> Flip through all seven chips in under a minute for a complete read on the day. Gainers tells you where momentum is; Losers flags potential mean-reversion setups; Most Active shows where institutional flow is landing; Trending captures retail attention. Combine with the Indices Ribbon for full market context before taking a position.
+      </div>
     </div>
 
     <!-- Top Pick -->
